@@ -9,5 +9,4 @@ public class PlatApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PlatApplication.class, args);
 	}
-
 }
