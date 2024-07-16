@@ -30,7 +30,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build Docker
-      run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/plat_server .
+      run: docker build --platform linux/amd64 -t -f ./Dockerfile . ${{ secrets.DOCKERHUB_USERNAME }}/plat_server .
     - name: Push Docker
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/plat_server:latest
         
