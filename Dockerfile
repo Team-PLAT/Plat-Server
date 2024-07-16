@@ -7,5 +7,4 @@ ARG ENV
 COPY ${JAR_FILE} app.jar
 COPY ${YML_FIEL} application.yml
 COPY ${YML_SECRET_FILE} application-secret.yml
-COPY config/application.yml /app/config/application.yml
 ENTRYPOINT ["java", "-Dspring.profiles.active=${PROFILES}", "-Dspring.config.location=application.yml", "-Dserver.env=${ENV}", "-jar", "app.jar"]
