@@ -35,7 +35,7 @@ public class TestController {
 
     @GetMapping
     private String printTest() {
-        return "TEST";
+        return "TEST!!!";
     }
 
     @GetMapping("/health-check")
