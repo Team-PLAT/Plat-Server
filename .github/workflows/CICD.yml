@@ -1,0 +1,101 @@
+name: CICD
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Build with Gradle Wrapper
+      run: ./gradlew build
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build Docker
+      run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/plat_server .
+    - name: Push Docker
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/plat_server:latest
+        
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set target IP
+        run: |
+          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.PLAT_SERVER_IP }}/env")
+          echo $STATUS
+          if [ $STATUS = 200 ]; then
+            CURRENT_UPSTREAM=$(curl -s "http://${{ secrets.PLAT_SERVER_IP }}/env")
+          else
+            CURRENT_UPSTREAM=green
+          fi
+          echo CURRENT_UPSTREAM=$CURRENT_UPSTREAM >> $GITHUB_ENV
+          if [ $CURRENT_UPSTREAM = blue ]; then
+            echo "CURRENT_PORT=8080" >> $GITHUB_ENV
+            echo "STOPPED_PORT=8081" >> $GITHUB_ENV
+            echo "TARGET_UPSTREAM=green" >> $GITHUB_ENV
+          elif [ $CURRENT_UPSTREAM = green ]; then
+            echo "CURRENT_PORT=8081" >> $GITHUB_ENV
+            echo "STOPPED_PORT=8080" >> $GITHUB_ENV
+            echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
+          else
+            echo "error"
+            exit 1
+          fi
+          
+      - name: Docker compose
+        uses: appleboy/ssh-action@master
+        with:
+          username: ubuntu
+          host: ${{ secrets.PLAT_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/plat_server:latest
+            sudo docker-compose -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d
+      
+      - name: Check deploy server URL
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: http://${{ secrets.PLAT_SERVER_IP }}:${{env.STOPPED_PORT}}/env
+          max-attempts: 3
+          retry-delay: 10s
+
+      - name: Change nginx upstream
+        uses: appleboy/ssh-action@master
+        with:
+          username: ubuntu
+          host: ${{ secrets.PLAT_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc && nginx -s reload' 
+
+      - name: Stop current server
+        uses: appleboy/ssh-action@master
+        with:
+          username: ubuntu
+          host: ${{ secrets.PLAT_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            sudo docker stop ${{env.CURRENT_UPSTREAM}}
+            sudo docker rm ${{env.CURRENT_UPSTREAM}}
