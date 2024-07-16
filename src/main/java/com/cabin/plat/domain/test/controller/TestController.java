@@ -49,9 +49,9 @@ public class TestController {
     }
 
     @GetMapping("/env")
-    private BaseResponse<?> getEnv() {
+    private String getEnv() {
         Map<String, String> responseData = new HashMap<>();
 
-        return BaseResponse.onSuccess(env);
+        return env;
     }
 }
