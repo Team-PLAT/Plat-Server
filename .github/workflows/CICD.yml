@@ -22,7 +22,7 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: |
-        echo ${{ secret.APPLICATION_SECRET }} | base64 --decode > ./config/application-secret.yml
+        echo ${{ secrets.APPLICATION_SECRET }} | base64 --decode > ./config/application-secret.yml
         cat ./config/application-secret.yml
         ./gradlew build -x test
 
