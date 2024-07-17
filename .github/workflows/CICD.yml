@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GIT_ACCESS_TOKEN }}
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -21,7 +24,10 @@ jobs:
         distribution: 'temurin'
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      run: |
+        echo ${{ secrets.APPLICATION_SECRET }} | base64 --decode > ./config/application-secret.yml
+        cat ./config/application-secret.yml
+        ./gradlew build -x test
 
     - name: Login to DockerHub
       uses: docker/login-action@v1
@@ -30,7 +36,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build Docker
-      run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/plat_server .
+      run: docker build --platform linux/amd64 -f ./Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/plat_server . 
     - name: Push Docker
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/plat_server:latest
         
@@ -76,7 +82,7 @@ jobs:
         uses: jtalk/url-health-check-action@v3
         with:
           url: http://${{ secrets.PLAT_SERVER_IP }}:${{env.STOPPED_PORT}}/env
-          max-attempts: 3
+          max-attempts: 5
           retry-delay: 10s
 
       - name: Change nginx upstream
