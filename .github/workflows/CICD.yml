@@ -46,10 +46,10 @@ jobs:
     steps:
       - name: Set target IP
         run: |
-          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.PLAT_SERVER_IP }}/env")
+          STATUS=$(curl -o /dev/null -w "%{http_code}" "https://${{ secrets.PLAT_SERVER_DOMAIN }}/env")
           echo $STATUS
           if [ $STATUS = 200 ]; then
-            CURRENT_UPSTREAM=$(curl -s "http://${{ secrets.PLAT_SERVER_IP }}/env")
+            CURRENT_UPSTREAM=$(curl -s "https://${{ secrets.PLAT_SERVER_DOMAIN }}/env")
           else
             CURRENT_UPSTREAM=green
           fi
@@ -93,7 +93,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script_stop: true
           script: |
-            sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc && nginx -s reload' 
+            sudo docker exec -i plat_nginx_server bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc && nginx -s reload' 
 
       - name: Stop current server
         uses: appleboy/ssh-action@master
