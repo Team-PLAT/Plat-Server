@@ -54,4 +54,10 @@ public class TestController {
 
         return env;
     }
+
+    @GetMapping("/plat")
+    private BaseResponse<String> getPlat() {
+
+        return BaseResponse.onSuccess("Plat");
+    }
 }
