@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/")
 public class TestController {
 
     @Value("${server.env}")
