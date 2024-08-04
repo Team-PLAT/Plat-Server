@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Data
 @Entity
@@ -22,8 +24,10 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private StreamAccountType streamAccountType;
 
+    @CreatedDate
     private LocalDateTime created_at;
 
+    @LastModifiedDate
     private LocalDateTime updated_at;
 
     private LocalDateTime deleted_at;
