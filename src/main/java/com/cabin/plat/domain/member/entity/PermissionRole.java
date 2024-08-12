@@ -5,11 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SocialType {
-    KAKAO("카카오"),
-    GOOGLE("구글"),
-    NAVER("네이버"),
-    APPLE("애플");
-
+public enum PermissionRole {
+    ADMIN("관리자"),
+    CLIENT("클라이언트"),
+    DEVELOPER("개발자");
     private final String toKorean;
 }
