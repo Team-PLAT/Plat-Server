@@ -5,7 +5,30 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import lombok.Builder;
+import lombok.Getter;
+
 public class MemberResponse {
+
+    @Getter
+    @Builder
+    public static class ProfileInfo {
+        private Long memberId;
+        private String nickname;
+        private String avatar;
+    }
+
+    @Getter
+    @Builder
+    public static class MemberId {
+        private Long memberId;
+    }
+
+    @Getter
+    @Builder
+    public static class Avatar {
+        private String avatar;
+    }
 
     @Getter
     @Builder

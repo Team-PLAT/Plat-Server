@@ -1,12 +1,19 @@
 package com.cabin.plat.domain.member.dto;
 
-import com.cabin.plat.domain.member.entity.SocialType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
+import com.cabin.plat.domain.member.entity.SocialType;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 public class MemberRequest {
+
+    @Getter
+    @Builder
+    public static class Avatar {
+        private String avatar;
+    }
 
     @Getter
     @Builder
@@ -16,6 +23,7 @@ public class MemberRequest {
         private String encryptedUserIdentifier;
         private SocialType socialType;
     }
+
     @Getter
     @Builder
     @AllArgsConstructor
@@ -25,7 +33,4 @@ public class MemberRequest {
         private String fullName;
         private String email;
     }
-
-
-
 }
