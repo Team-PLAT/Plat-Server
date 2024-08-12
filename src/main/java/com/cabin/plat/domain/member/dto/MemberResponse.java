@@ -17,4 +17,13 @@ public class MemberResponse {
         private String refreshToken;
         private Boolean isServicedMember;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MemberTokens {
+        private String accessToken;
+        private String refreshToken;
+    }
 }
