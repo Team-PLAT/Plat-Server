@@ -18,4 +18,10 @@ public class MemberResponse {
     public static class MemberId {
         private Long memberId;
     }
+
+    @Getter
+    @Builder
+    public static class Avatar {
+        private String avatar;
+    }
 }

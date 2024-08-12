@@ -26,6 +26,7 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column
+    @Setter
     private String avatar;
 
     @Enumerated(EnumType.STRING)
