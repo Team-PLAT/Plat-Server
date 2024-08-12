@@ -1,4 +1,4 @@
-package com.cabin.plat.config;
+package com.cabin.plat.config.jwt.dto;
 
 import lombok.Getter;
 import lombok.Setter;
