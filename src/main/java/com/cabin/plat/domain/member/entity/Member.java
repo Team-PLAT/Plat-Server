@@ -30,6 +30,7 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column
+    @Setter
     private StreamType streamType;
 
     @Enumerated(EnumType.STRING)

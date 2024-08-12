@@ -12,4 +12,10 @@ public class MemberResponse {
         private String nickname;
         private String avatar;
     }
+
+    @Getter
+    @Builder
+    public static class MemberId {
+        private Long memberId;
+    }
 }

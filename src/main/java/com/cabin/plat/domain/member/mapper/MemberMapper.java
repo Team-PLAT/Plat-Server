@@ -13,4 +13,10 @@ public class MemberMapper {
                 .avatar(avatar)
                 .build();
     }
+
+    public MemberResponse.MemberId toMemberId(Long memberId) {
+        return MemberResponse.MemberId.builder()
+                .memberId(memberId)
+                .build();
+    }
 }
