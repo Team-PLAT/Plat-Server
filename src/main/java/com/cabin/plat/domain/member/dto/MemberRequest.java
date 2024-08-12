@@ -12,7 +12,7 @@ public class MemberRequest {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class MemberSignIn {
+    public static class MemberAppleSocialSignIn {
         private String encryptedUserIdentifier;
         private String fullName;
         private String email;
