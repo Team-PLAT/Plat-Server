@@ -1,4 +1,4 @@
-package com.cabin.plat.domain.entity;
+package com.cabin.plat.domain.test.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
