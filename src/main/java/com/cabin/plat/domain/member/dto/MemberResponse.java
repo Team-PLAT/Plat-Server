@@ -15,7 +15,7 @@ public class MemberResponse {
         private Long memberId;
         private String accessToken;
         private String refreshToken;
-        private Boolean isServicedMember;
+        private Boolean isServiced;
     }
 
     @Getter
