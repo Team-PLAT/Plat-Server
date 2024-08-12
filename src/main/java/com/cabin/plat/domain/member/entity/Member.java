@@ -18,6 +18,10 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PermissionRole permissionRole;
+
     // Apple Social Login시 반환되는 userIdentifier을 SHA256 방식으로 암호화 시킨 String 값.
     // 유저 중복 검사할 때 사용.
     @Column(nullable = false)
