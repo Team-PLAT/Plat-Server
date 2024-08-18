@@ -46,7 +46,6 @@ public class Member extends BaseEntity {
     private String avatar;
 
     @Enumerated(EnumType.STRING)
-    @Column
     @Setter
     private StreamType streamType;
 

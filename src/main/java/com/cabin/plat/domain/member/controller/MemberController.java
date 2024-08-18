@@ -36,8 +36,8 @@ public class MemberController {
         return BaseResponse.onSuccess(memberService.getProfileInfo(member));
     }
 
-    @Operation(summary = "유저 스트리밍 계정 선택", description = "멤버의 스트리밍 계정 정보를 변경합니다.")
-    @PostMapping("/profile")
+    @Operation(summary = "유저 스트리밍 계정 선택 (변경)", description = "멤버의 스트리밍 계정 정보를 변경합니다.")
+    @PatchMapping("/profile")
     public BaseResponse<MemberResponse.MemberId> updateStreamType(@AuthMember Member member, @RequestParam StreamType streamType) {
         return BaseResponse.onSuccess(memberService.updateStreamType(member, streamType));
     }
