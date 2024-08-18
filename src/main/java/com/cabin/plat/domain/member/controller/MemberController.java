@@ -1,7 +1,9 @@
 package com.cabin.plat.domain.member.controller;
 
+import com.cabin.plat.config.AuthMember;
 import com.cabin.plat.domain.member.dto.MemberRequest;
 import com.cabin.plat.domain.member.dto.MemberResponse;
+import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.entity.SocialType;
 import com.cabin.plat.domain.member.entity.StreamType;
 import com.cabin.plat.domain.member.service.MemberService;
@@ -28,17 +30,16 @@ public class MemberController {
         return BaseResponse.onSuccess(memberService.appleSocialSignIn(request, socialType));
     }
 
-    // TODO: Spring Security 설정 후 매개변수 @AuthMember 로 변경
     @Operation(summary = "유저 프로필 조회", description = "멤버 아이디, 닉네임, 프로필 이미지 url을 응답으로 반환합니다.")
     @GetMapping("/profile")
-    public BaseResponse<MemberResponse.ProfileInfo> getProfileInfo(Long memberId) {
-        return BaseResponse.onSuccess(memberService.getProfileInfo(memberId));
+    public BaseResponse<MemberResponse.ProfileInfo> getProfileInfo(@AuthMember Member member) {
+        return BaseResponse.onSuccess(memberService.getProfileInfo(member));
     }
 
     @Operation(summary = "유저 스트리밍 계정 선택", description = "멤버의 스트리밍 계정 정보를 변경합니다.")
     @PostMapping("/profile")
-    public BaseResponse<MemberResponse.MemberId> updateStreamType(Long memberId, @RequestParam StreamType streamType) {
-        return BaseResponse.onSuccess(memberService.updateStreamType(memberId, streamType));
+    public BaseResponse<MemberResponse.MemberId> updateStreamType(@AuthMember Member member, @RequestParam StreamType streamType) {
+        return BaseResponse.onSuccess(memberService.updateStreamType(member, streamType));
     }
 
     // TODO: s3 저장 미구현
@@ -50,8 +51,8 @@ public class MemberController {
 
     @Operation(summary = "유저 프로필 사진 변경", description = "아바타 이미지 URL을 받아 프로필을 업데이트합니다.")
     @PatchMapping("/profile/avatar")
-    public BaseResponse<MemberResponse.MemberId> updateAvatarUrl(@RequestParam Long memberId,
+    public BaseResponse<MemberResponse.MemberId> updateAvatarUrl(@AuthMember Member member,
                                                   @RequestBody MemberRequest.Avatar avatar) {
-        return BaseResponse.onSuccess(memberService.updateAvatarUrl(memberId, avatar.getAvatar()));
+        return BaseResponse.onSuccess(memberService.updateAvatarUrl(member, avatar.getAvatar()));
     }
 }
