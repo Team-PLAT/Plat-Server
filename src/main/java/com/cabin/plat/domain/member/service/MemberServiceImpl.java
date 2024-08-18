@@ -1,5 +1,6 @@
 package com.cabin.plat.domain.member.service;
 
+import com.cabin.plat.domain.member.dto.MemberRequest.MemberNickname;
 import com.cabin.plat.domain.member.dto.MemberResponse;
 import com.cabin.plat.domain.member.dto.MemberResponse.Avatar;
 import com.cabin.plat.domain.member.dto.MemberResponse.MemberId;
@@ -148,10 +149,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberId resign(Member member) {
+    public MemberResponse.MemberId resign(Member member) {
         Member deleteMember = findMemberById(member.getId());
         deleteMember.delete();
         memberRepository.save(deleteMember);
-        return null;
+        return memberMapper.toMemberId(deleteMember.getId());
+    }
+
+    @Override
+    public MemberResponse.MemberId updateNickname(Member member, String nickname) {
+        Member updateMember = findMemberById(member.getId());
+        updateMember.setNickname(nickname);
+        memberRepository.save(updateMember);
+        return memberMapper.toMemberId(updateMember.getId());
     }
 }

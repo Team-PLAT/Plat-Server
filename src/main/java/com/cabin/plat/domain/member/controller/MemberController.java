@@ -61,4 +61,10 @@ public class MemberController {
     public BaseResponse<MemberResponse.MemberId> resign(@AuthMember Member member) {
         return BaseResponse.onSuccess(memberService.resign(member));
     }
+
+    @Operation(summary = "유저 프로필 닉네임 변경", description = "유저의 닉네임을 변경합니다. 변경할 닉네임을 바디로 보내주세요")
+    @PatchMapping("/profile/nickname")
+    public BaseResponse<MemberResponse.MemberId> updateNickname(@AuthMember Member member, @RequestBody MemberRequest.MemberNickname nickname) {
+        return BaseResponse.onSuccess(memberService.updateNickname(member, nickname.getNickname()));
+    }
 }
