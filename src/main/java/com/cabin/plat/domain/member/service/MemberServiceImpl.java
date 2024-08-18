@@ -147,4 +147,11 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.toMemberSignIn(member, tokenInfo, isServiced);
     }
 
+    @Override
+    public MemberId resign(Member member) {
+        Member deleteMember = findMemberById(member.getId());
+        deleteMember.delete();
+        memberRepository.save(deleteMember);
+        return null;
+    }
 }

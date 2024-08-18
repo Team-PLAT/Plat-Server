@@ -20,4 +20,6 @@ public interface MemberService {
     MemberResponse.MemberSignIn appleSocialSignIn(MemberRequest.MemberAppleSocialSignIn request, SocialType socialType);
 
     MemberResponse.MemberSignIn signIn(MemberRequest.MemberSignIn request);
+
+    MemberResponse.MemberId resign(Member member);
 }

@@ -55,4 +55,10 @@ public class MemberController {
                                                   @RequestBody MemberRequest.Avatar avatar) {
         return BaseResponse.onSuccess(memberService.updateAvatarUrl(member, avatar.getAvatar()));
     }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 합니다. 멤버의 정보가 소프트 딜리트 됩니다.")
+    @DeleteMapping("/resign")
+    public BaseResponse<MemberResponse.MemberId> resign(@AuthMember Member member) {
+        return BaseResponse.onSuccess(memberService.resign(member));
+    }
 }
