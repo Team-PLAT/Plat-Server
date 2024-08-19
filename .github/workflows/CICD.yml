@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -41,6 +42,7 @@ jobs:
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/plat_server:latest
         
   deploy:
+    if: github.event_name == 'push'
     needs: build
     runs-on: ubuntu-latest
     steps:
