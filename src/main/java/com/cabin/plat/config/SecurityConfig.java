@@ -3,6 +3,7 @@ package com.cabin.plat.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,6 +47,8 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers(HttpMethod.GET, "/static/js/**","/static/css/**","/static/img/**"
+                                ,"/swagger-ui/**","/api-docs/**", "api/authenticate", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/", "/members", "/health-check", "/env").permitAll()
                         .requestMatchers("/members/sign-in").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
