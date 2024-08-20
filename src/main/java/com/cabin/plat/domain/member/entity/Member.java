@@ -38,6 +38,7 @@ public class Member extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
+    @Setter
     private String nickname;
 
     @Column
@@ -45,7 +46,6 @@ public class Member extends BaseEntity {
     private String avatar;
 
     @Enumerated(EnumType.STRING)
-    @Column
     @Setter
     private StreamType streamType;
 

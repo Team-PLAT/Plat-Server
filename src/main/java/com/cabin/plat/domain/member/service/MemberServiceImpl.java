@@ -1,5 +1,6 @@
 package com.cabin.plat.domain.member.service;
 
+import com.cabin.plat.domain.member.dto.MemberRequest.MemberNickname;
 import com.cabin.plat.domain.member.dto.MemberResponse;
 import com.cabin.plat.domain.member.dto.MemberResponse.Avatar;
 import com.cabin.plat.domain.member.dto.MemberResponse.MemberId;
@@ -96,15 +97,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public ProfileInfo getProfileInfo(Long memberId) {
-        Member member = findMemberById(memberId);
+    public ProfileInfo getProfileInfo(Member member) {
         return memberMapper.toProfileInfo(member.getId(), member.getNickname(), member.getAvatar());
     }
 
     @Override
     @Transactional
-    public MemberId updateStreamType(Long memberId, StreamType streamType) {
-        Member updateMember = findMemberById(memberId);
+    public MemberId updateStreamType(Member member, StreamType streamType) {
+        Member updateMember = findMemberById(member.getId());
         updateMember.setStreamType(streamType);
         memberRepository.save(updateMember);
         return memberMapper.toMemberId(updateMember.getId());
@@ -118,8 +118,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberId updateAvatarUrl(Long memberId, String avatar) {
-        Member updateMember = findMemberById(memberId);
+    public MemberId updateAvatarUrl(Member member, String avatar) {
+        Member updateMember = findMemberById(member.getId());
         updateMember.setAvatar(avatar);
         memberRepository.save(updateMember);
         return memberMapper.toMemberId(updateMember.getId());
@@ -148,4 +148,19 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.toMemberSignIn(member, tokenInfo, isServiced);
     }
 
+    @Override
+    public MemberResponse.MemberId resign(Member member) {
+        Member deleteMember = findMemberById(member.getId());
+        deleteMember.delete();
+        memberRepository.save(deleteMember);
+        return memberMapper.toMemberId(deleteMember.getId());
+    }
+
+    @Override
+    public MemberResponse.MemberId updateNickname(Member member, String nickname) {
+        Member updateMember = findMemberById(member.getId());
+        updateMember.setNickname(nickname);
+        memberRepository.save(updateMember);
+        return memberMapper.toMemberId(updateMember.getId());
+    }
 }
