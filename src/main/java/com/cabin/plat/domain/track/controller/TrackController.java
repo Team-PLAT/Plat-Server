@@ -33,7 +33,13 @@ public class TrackController {
         ));
     }
 
-    @Operation(summary = "트랙 디테일 조회", description = "트랙의 아이디로 트랙의 디테일한 정보를 조회합니다.")
+    @Operation(summary = "트랙 디테일 조회", description = "트랙의 아이디로 트랙의 디테일한 정보를 조회합니다. "
+            + "locationString : 장소 이름 (없으면 빈 문자열)  "
+            + "address : 주소  "
+            + "imageUrl : 이미지 주소 (없으면 빈 문자열)  "
+            + "context: : 본문  "
+            + "likeCount: 트랙의 총 좋아요 개수  "
+            + "isLiked : 사용자가 좋아요를 눌렀는지 여부")
     @GetMapping("/{track-id}")
     public BaseResponse<TrackResponse.TrackDetail> getTrackById(@AuthMember Member member, @PathVariable("track-id") String trackId) {
         return BaseResponse.onSuccess(trackService.getTrackById(member, trackId));

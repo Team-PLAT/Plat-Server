@@ -19,9 +19,8 @@ public class TrackResponse {
         private List<TrackDetail> trackDetails;
     }
 
-    @Getter
     @Builder
-    private static class TrackMap {
+    public static class TrackMap {
         private Long trackId;
         private String isrc;
         private Boolean isLiked;
@@ -48,7 +47,7 @@ public class TrackResponse {
 
     @Getter
     @Builder
-    private static class MemberInfo {
+    public static class MemberInfo {
         private Long memberId;
         private String memberNickname;
         private String avatar;

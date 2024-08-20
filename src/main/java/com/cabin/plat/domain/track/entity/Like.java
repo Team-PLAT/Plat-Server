@@ -1,7 +1,6 @@
 package com.cabin.plat.domain.track.entity;
 
 import com.cabin.plat.domain.member.entity.Member;
-import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
