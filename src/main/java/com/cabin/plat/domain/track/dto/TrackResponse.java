@@ -56,13 +56,13 @@ public class TrackResponse {
 
     @Getter
     @Builder
-    private static class TrackId {
+    public static class TrackId {
         private Long trackId;
     }
 
     @Getter
     @Builder
-    private static class ReportId {
+    public static class ReportId {
         private Long reportId;
     }
 }

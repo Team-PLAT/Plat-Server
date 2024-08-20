@@ -17,7 +17,7 @@ public class TrackRequest {
         private String isrc;
         private String imageUrl;
         private String context;
-        private Double latitude;
-        private Double longitude;
+        private double latitude;
+        private double longitude;
     }
 }
