@@ -19,7 +19,7 @@ public class MemberRequest {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class MemberSignIn {
+    public static class MemberSignInByEncryptedUserIdentifier {
         private String encryptedUserIdentifier;
         private SocialType socialType;
     }
