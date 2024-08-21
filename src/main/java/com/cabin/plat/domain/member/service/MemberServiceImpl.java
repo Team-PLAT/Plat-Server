@@ -1,6 +1,5 @@
 package com.cabin.plat.domain.member.service;
 
-import com.cabin.plat.domain.member.dto.MemberRequest.MemberNickname;
 import com.cabin.plat.domain.member.dto.MemberResponse;
 import com.cabin.plat.domain.member.dto.MemberResponse.Avatar;
 import com.cabin.plat.domain.member.dto.MemberResponse.MemberId;
@@ -14,14 +13,10 @@ import com.cabin.plat.global.exception.errorCode.MemberErrorCode;
 import com.cabin.plat.config.jwt.dto.TokenInfo;
 import com.cabin.plat.config.jwt.service.JwtUtil;
 import com.cabin.plat.domain.member.dto.MemberRequest;
-import com.cabin.plat.domain.member.dto.MemberResponse;
-import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.entity.PermissionRole;
 import com.cabin.plat.domain.member.entity.RefreshToken;
 import com.cabin.plat.domain.member.entity.SocialType;
 import com.cabin.plat.domain.member.mapper.AuthenticationMapper;
-import com.cabin.plat.domain.member.mapper.MemberMapper;
-import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.member.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +28,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -58,7 +53,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberResponse.MemberSignIn signIn(MemberRequest.MemberSignIn request) {
+    public MemberResponse.MemberSignIn signIn(MemberRequest.MemberSignInByEncryptedUserIdentifier request) {
 
         String clientId = request.getEncryptedUserIdentifier();
         SocialType socialType = request.getSocialType();
