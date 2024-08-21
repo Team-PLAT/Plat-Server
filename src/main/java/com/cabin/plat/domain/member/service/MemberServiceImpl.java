@@ -18,6 +18,7 @@ import com.cabin.plat.domain.member.entity.RefreshToken;
 import com.cabin.plat.domain.member.entity.SocialType;
 import com.cabin.plat.domain.member.mapper.AuthenticationMapper;
 import com.cabin.plat.domain.member.repository.RefreshTokenRepository;
+import com.cabin.plat.global.util.S3FileComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
+    private final S3FileComponent s3FileComponent;
     private final AuthenticationMapper authenticationMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
@@ -106,10 +108,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Avatar uploadAvatarImage(MultipartFile file) {
-        // TODO: S3 에 이미지 업로드
-//        return new MemberResponse.Avatar(s3ImageComponent.uploadImage(image));
-        return null;
+    public Avatar uploadAvatarImage(MultipartFile image) {
+        return memberMapper.toAvatar(s3FileComponent.uploadFile("image", image));
     }
 
     @Override

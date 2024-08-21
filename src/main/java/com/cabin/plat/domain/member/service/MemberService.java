@@ -13,7 +13,7 @@ public interface MemberService {
 
     MemberResponse.MemberId updateStreamType(Member member, StreamType streamType);
 
-    MemberResponse.Avatar uploadAvatarImage(MultipartFile file);
+    MemberResponse.Avatar uploadAvatarImage(MultipartFile image);
 
     MemberResponse.MemberId updateAvatarUrl(Member member, String avatar);
 

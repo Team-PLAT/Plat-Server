@@ -4,13 +4,13 @@ import com.cabin.plat.config.AuthMember;
 import com.cabin.plat.domain.member.dto.MemberRequest;
 import com.cabin.plat.domain.member.dto.MemberResponse;
 import com.cabin.plat.domain.member.entity.Member;
-import com.cabin.plat.domain.member.entity.SocialType;
 import com.cabin.plat.domain.member.entity.StreamType;
 import com.cabin.plat.domain.member.service.MemberService;
 import com.cabin.plat.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,11 +42,10 @@ public class MemberController {
         return BaseResponse.onSuccess(memberService.updateStreamType(member, streamType));
     }
 
-    // TODO: s3 저장 미구현
     @Operation(summary = "유저 프로필 사진 업로드", description = "아바타 이미지를 업로드하고 URL을 반환합니다.")
-    @PostMapping("/profile/avatar/upload")
-    public BaseResponse<MemberResponse.Avatar> uploadAvatarImage(@RequestParam("avatar") MultipartFile file) {
-        return BaseResponse.onSuccess(memberService.uploadAvatarImage(file));
+    @PostMapping(value = "/profile/avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<MemberResponse.Avatar> uploadAvatarImage(@RequestPart(value = "image") MultipartFile image) {
+        return BaseResponse.onSuccess(memberService.uploadAvatarImage(image));
     }
 
     @Operation(summary = "유저 프로필 사진 변경", description = "아바타 이미지 URL을 받아 프로필을 업데이트합니다.")

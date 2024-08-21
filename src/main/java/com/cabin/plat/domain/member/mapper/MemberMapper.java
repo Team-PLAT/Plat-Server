@@ -42,4 +42,10 @@ public class MemberMapper {
                 .email("")
                 .build();
     }
+
+    public MemberResponse.Avatar toAvatar(String avatar) {
+        return MemberResponse.Avatar.builder()
+                .avatar(avatar)
+                .build();
+    }
 }
