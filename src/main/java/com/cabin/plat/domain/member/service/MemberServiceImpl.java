@@ -113,6 +113,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberId updateAvatarUrl(Member member, String avatar) {
         Member updateMember = findMemberById(member.getId());
         updateMember.setAvatar(avatar);
@@ -144,6 +145,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberResponse.MemberId resign(Member member) {
         Member deleteMember = findMemberById(member.getId());
         deleteMember.delete();
@@ -152,6 +154,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberResponse.MemberId updateNickname(Member member, String nickname) {
         Member updateMember = findMemberById(member.getId());
         updateMember.setNickname(nickname);

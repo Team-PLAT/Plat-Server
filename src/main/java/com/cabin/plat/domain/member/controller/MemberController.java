@@ -42,13 +42,13 @@ public class MemberController {
         return BaseResponse.onSuccess(memberService.updateStreamType(member, streamType));
     }
 
-    @Operation(summary = "유저 프로필 사진 업로드", description = "아바타 이미지를 업로드하고 URL을 반환합니다.")
+    @Operation(summary = "유저 프로필 사진 업로드", description = "아바타 이미지를 업로드하고 URL을 반환합니다. \"유저 프로필 사진 변경\" API를 호출하기 직전에 사용해서 이미지의 URL을 받으세요.")
     @PostMapping(value = "/profile/avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MemberResponse.Avatar> uploadAvatarImage(@RequestPart(value = "image") MultipartFile image) {
         return BaseResponse.onSuccess(memberService.uploadAvatarImage(image));
     }
 
-    @Operation(summary = "유저 프로필 사진 변경", description = "아바타 이미지 URL을 받아 프로필을 업데이트합니다.")
+    @Operation(summary = "유저 프로필 사진 변경", description = "아바타 이미지 URL을 받아 프로필을 업데이트합니다. \"유저 프로필 사진 업로드\" API를 호출해서 받은 이미지의 URL을 넘겨주세요.")
     @PatchMapping("/profile/avatar")
     public BaseResponse<MemberResponse.MemberId> updateAvatarUrl(@AuthMember Member member,
                                                   @RequestBody MemberRequest.Avatar avatar) {

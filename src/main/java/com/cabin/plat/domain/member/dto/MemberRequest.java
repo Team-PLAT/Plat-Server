@@ -11,6 +11,8 @@ public class MemberRequest {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Avatar {
         private String avatar;
     }
@@ -36,6 +38,8 @@ public class MemberRequest {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class MemberNickname {
         private String nickname;
     }
