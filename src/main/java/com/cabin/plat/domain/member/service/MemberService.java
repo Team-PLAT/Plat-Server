@@ -11,6 +11,8 @@ import com.cabin.plat.domain.member.entity.SocialType;
 public interface MemberService {
     MemberResponse.ProfileInfo getProfileInfo(Member member);
 
+    MemberResponse.ProfileStreamType getProfileStreamType(Member member);
+
     MemberResponse.MemberId updateStreamType(Member member, StreamType streamType);
 
     MemberResponse.Avatar uploadAvatarImage(MultipartFile image);

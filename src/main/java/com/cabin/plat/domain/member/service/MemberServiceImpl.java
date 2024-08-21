@@ -1,9 +1,7 @@
 package com.cabin.plat.domain.member.service;
 
 import com.cabin.plat.domain.member.dto.MemberResponse;
-import com.cabin.plat.domain.member.dto.MemberResponse.Avatar;
-import com.cabin.plat.domain.member.dto.MemberResponse.MemberId;
-import com.cabin.plat.domain.member.dto.MemberResponse.ProfileInfo;
+import com.cabin.plat.domain.member.dto.MemberResponse.*;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.entity.StreamType;
 import com.cabin.plat.domain.member.mapper.MemberMapper;
@@ -96,6 +94,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public ProfileInfo getProfileInfo(Member member) {
         return memberMapper.toProfileInfo(member.getId(), member.getNickname(), member.getAvatar());
+    }
+
+    @Override
+    public ProfileStreamType getProfileStreamType(Member member) {
+        return memberMapper.toProfileStreamType(member.getStreamType());
     }
 
     @Override

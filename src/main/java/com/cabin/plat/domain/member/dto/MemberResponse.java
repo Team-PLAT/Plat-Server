@@ -1,5 +1,6 @@
 package com.cabin.plat.domain.member.dto;
 
+import com.cabin.plat.domain.member.entity.StreamType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,12 @@ public class MemberResponse {
         private Long memberId;
         private String nickname;
         private String avatar;
+    }
+
+    @Getter
+    @Builder
+    public static class ProfileStreamType {
+        private StreamType streamType;
     }
 
     @Getter

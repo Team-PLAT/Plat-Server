@@ -1,10 +1,8 @@
 package com.cabin.plat.domain.member.mapper;
 
 import com.cabin.plat.domain.member.dto.MemberResponse;
-import com.cabin.plat.domain.member.entity.Member;
+import com.cabin.plat.domain.member.entity.*;
 import com.cabin.plat.config.jwt.dto.TokenInfo;
-import com.cabin.plat.domain.member.entity.PermissionRole;
-import com.cabin.plat.domain.member.entity.SocialType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +12,12 @@ public class MemberMapper {
                 .memberId(memberId)
                 .nickname(nickname)
                 .avatar(avatar)
+                .build();
+    }
+
+    public MemberResponse.ProfileStreamType toProfileStreamType(StreamType streamType) {
+        return MemberResponse.ProfileStreamType.builder()
+                .streamType(streamType)
                 .build();
     }
 
