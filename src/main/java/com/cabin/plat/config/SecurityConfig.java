@@ -1,5 +1,7 @@
 package com.cabin.plat.config;
 
+import com.cabin.plat.config.jwt.filter.JwtFilter;
+import com.cabin.plat.config.jwt.service.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,13 +13,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,10 +52,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(HttpMethod.GET, "/static/js/**","/static/css/**","/static/img/**"
                                 ,"/swagger-ui/**","/api-docs/**", "api/authenticate", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/", "/members", "/health-check", "/env").permitAll()
+                        .requestMatchers("/env", "/health-check", "/base-response", "/error-handler").permitAll()
                         .requestMatchers("/members/sign-in").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+                        .requestMatchers("/test").authenticated()
+                        .requestMatchers("/members/**").authenticated()
+                        .anyRequest().denyAll());
+
+        http
+                .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         //세션 설정
         http

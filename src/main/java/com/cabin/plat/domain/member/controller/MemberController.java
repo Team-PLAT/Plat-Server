@@ -21,14 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/sign-up/apple")
-    public BaseResponse<MemberResponse.MemberSignIn> appleSocialSignIn(
-            MemberRequest.MemberAppleSocialSignIn request,
-            @RequestParam SocialType socialType
-            ) {
-
-        return BaseResponse.onSuccess(memberService.appleSocialSignIn(request, socialType));
-    }
+//    @PostMapping("/sign-up/apple")
+//    public BaseResponse<MemberResponse.MemberSignIn> appleSocialSignIn(
+//            MemberRequest.MemberAppleSocialSignIn request,
+//            @RequestParam SocialType socialType
+//            ) {
+//
+//        return BaseResponse.onSuccess(memberService.appleSocialSignIn(request, socialType));
+//    }
 
     @Operation(summary = "유저 프로필 조회", description = "멤버 아이디, 닉네임, 프로필 이미지 url을 응답으로 반환합니다.")
     @GetMapping("/profile")
