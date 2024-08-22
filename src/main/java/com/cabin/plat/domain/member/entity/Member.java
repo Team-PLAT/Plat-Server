@@ -14,7 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-//@SQLRestriction("deleted_at is null")
+@SQLRestriction("deleted_at is null")
 public class Member extends BaseEntity {
 
     @Id

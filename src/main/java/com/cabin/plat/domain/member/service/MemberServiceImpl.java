@@ -1,9 +1,7 @@
 package com.cabin.plat.domain.member.service;
 
 import com.cabin.plat.domain.member.dto.MemberResponse;
-import com.cabin.plat.domain.member.dto.MemberResponse.Avatar;
-import com.cabin.plat.domain.member.dto.MemberResponse.MemberId;
-import com.cabin.plat.domain.member.dto.MemberResponse.ProfileInfo;
+import com.cabin.plat.domain.member.dto.MemberResponse.*;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.entity.StreamType;
 import com.cabin.plat.domain.member.mapper.MemberMapper;
@@ -18,6 +16,7 @@ import com.cabin.plat.domain.member.entity.RefreshToken;
 import com.cabin.plat.domain.member.entity.SocialType;
 import com.cabin.plat.domain.member.mapper.AuthenticationMapper;
 import com.cabin.plat.domain.member.repository.RefreshTokenRepository;
+import com.cabin.plat.global.util.S3FileComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +32,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
+    private final S3FileComponent s3FileComponent;
     private final AuthenticationMapper authenticationMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
@@ -97,6 +97,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public ProfileStreamType getProfileStreamType(Member member) {
+        return memberMapper.toProfileStreamType(member.getStreamType());
+    }
+
+    @Override
     @Transactional
     public MemberId updateStreamType(Member member, StreamType streamType) {
         Member updateMember = findMemberById(member.getId());
@@ -106,13 +111,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Avatar uploadAvatarImage(MultipartFile file) {
-        // TODO: S3 에 이미지 업로드
-//        return new MemberResponse.Avatar(s3ImageComponent.uploadImage(image));
-        return null;
+    public Avatar uploadAvatarImage(MultipartFile image) {
+        return memberMapper.toAvatar(s3FileComponent.uploadFile("image", image));
     }
 
     @Override
+    @Transactional
     public MemberId updateAvatarUrl(Member member, String avatar) {
         Member updateMember = findMemberById(member.getId());
         updateMember.setAvatar(avatar);
@@ -144,6 +148,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberResponse.MemberId resign(Member member) {
         Member deleteMember = findMemberById(member.getId());
         deleteMember.delete();
@@ -152,6 +157,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberResponse.MemberId updateNickname(Member member, String nickname) {
         Member updateMember = findMemberById(member.getId());
         updateMember.setNickname(nickname);
