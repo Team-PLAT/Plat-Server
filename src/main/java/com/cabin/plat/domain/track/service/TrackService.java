@@ -14,13 +14,13 @@ public interface TrackService {
                                                    double endLongitude
     );
 
-    TrackResponse.TrackDetail getTrackById(Member member, String trackId);
+    TrackResponse.TrackDetail getTrackById(Member member, Long trackId);
 
-    TrackResponse.TrackId likeTrack(Member member, String trackId, Boolean isLiked);
+    TrackResponse.TrackId likeTrack(Member member, Long trackId, Boolean isLiked);
 
     TrackResponse.TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload);
 
     TrackResponse.TrackDetailList getTrackFeeds(Member member);
 
-    TrackResponse.ReportId reportTrack(Member member, String trackId);
+    TrackResponse.ReportId reportTrack(Member member, Long trackId);
 }

@@ -18,12 +18,12 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    public TrackDetail getTrackById(Member member, String trackId) {
+    public TrackDetail getTrackById(Member member, Long trackId) {
         return null;
     }
 
     @Override
-    public TrackId likeTrack(Member member, String trackId, Boolean isLiked) {
+    public TrackId likeTrack(Member member, Long trackId, Boolean isLiked) {
         return null;
     }
 
@@ -38,7 +38,7 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    public ReportId reportTrack(Member member, String trackId) {
+    public ReportId reportTrack(Member member, Long trackId) {
         return null;
     }
 }
