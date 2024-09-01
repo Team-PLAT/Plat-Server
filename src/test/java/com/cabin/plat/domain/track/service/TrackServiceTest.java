@@ -144,7 +144,9 @@ class TrackServiceTest {
 
         // then
         assertThat(trackMaps.size()).isEqualTo(2);
-        assertThat(trackMaps).containsExactlyInAnyOrder(expectedTrackMap1, expectedTrackMap2);
+
+        assertThat(trackMaps).contains(expectedTrackMap1);
+        assertThat(trackMaps).contains(expectedTrackMap2);
     }
 
     @Test

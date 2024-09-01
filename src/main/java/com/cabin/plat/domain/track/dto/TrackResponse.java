@@ -3,6 +3,7 @@ package com.cabin.plat.domain.track.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 public class TrackResponse {
@@ -20,6 +21,7 @@ public class TrackResponse {
     }
 
     @Builder
+    @EqualsAndHashCode
     public static class TrackMap {
         private Long trackId;
         private String isrc;
