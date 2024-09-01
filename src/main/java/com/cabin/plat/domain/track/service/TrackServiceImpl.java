@@ -4,6 +4,7 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
+import com.cabin.plat.domain.track.entity.Location;
 import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.entity.TrackLike;
 import com.cabin.plat.domain.track.mapper.TrackMapper;
@@ -102,7 +103,24 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload) {
-        return null;
+        Location location = locationRepository.save(Location.builder()
+                .placeName("장소 이름 (미구현)") // TODO: 장소 이름
+                .address("주소 (미구현)") // TODO: 위도 경도로 주소 받아오기
+                .latitude(trackUpload.getLatitude())
+                .longitude(trackUpload.getLongitude())
+                .build());
+
+        Track track = Track.builder()
+                .member(member)
+                .location(location)
+                .isrc(trackUpload.getIsrc())
+                .content(trackUpload.getContext())
+                .imageUrl(trackUpload.getImageUrl())
+                .build();
+
+        Track savedTrack = trackRepository.save(track);
+
+        return trackMapper.toTrackId(savedTrack.getId());
     }
 
     @Override
