@@ -10,11 +10,11 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Like extends BaseEntity {
+public class TrackLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "like_id")
+    @Column(name = "track_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
