@@ -4,6 +4,7 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
+import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import com.cabin.plat.domain.track.entity.*;
 import com.cabin.plat.domain.track.mapper.TrackMapper;
 import com.cabin.plat.domain.track.repository.*;
@@ -18,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class TrackServiceImpl implements TrackService {
 
     private final TrackRepository trackRepository;
@@ -38,15 +39,15 @@ public class TrackServiceImpl implements TrackService {
         double maxLongitude = Math.max(startLongitude, endLongitude);
 
         List<Track> tracks = trackRepository.findAllTracksWithinBounds(
-                minLatitude, minLongitude, maxLatitude, maxLongitude);
+                minLatitude, maxLatitude, minLongitude, maxLongitude);
 
         List<TrackResponse.TrackMap> trackMaps = tracks.stream()
                 .map(track -> trackMapper.toTrackMap(
                         track.getId(),
                         track.getIsrc(),
                         trackLikeRepository.existsByMemberAndTrack(member, track),
-                        track.getLocation().getLongitude(),
-                        track.getLocation().getLatitude()))
+                        track.getLocation().getLatitude(),
+                        track.getLocation().getLongitude()))
                 .toList();
 
         return trackMapper.toTrackMapList(trackMaps);
@@ -55,26 +56,7 @@ public class TrackServiceImpl implements TrackService {
     @Override
     public TrackResponse.TrackDetail getTrackById(Member member, Long trackId) {
         Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
-        TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
-                track.getMember().getId(),
-                track.getMember().getNickname(),
-                track.getMember().getAvatar()
-        );
-
-        return trackMapper.toTrackDetail(
-                track.getId(),
-                track.getIsrc(),
-                track.getCreatedAt(),
-                track.getLocation().getLatitude(),
-                track.getLocation().getLongitude(),
-                track.getLocation().getPlaceName(),
-                track.getLocation().getAddress(),
-                track.getImageUrl(),
-                track.getContent(),
-                trackLikeRepository.countByTrack(track),
-                trackLikeRepository.existsByMemberAndTrack(member, track),
-                memberInfo
-        );
+        return getTrackDetail(member, track);
 
     }
 
@@ -127,30 +109,34 @@ public class TrackServiceImpl implements TrackService {
 
         List<TrackResponse.TrackDetail> trackDetails = tracks.stream()
                 .map(track -> {
-                    TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
-                            track.getMember().getId(),
-                            track.getMember().getNickname(),
-                            track.getMember().getAvatar()
-                    );
-
-                    return trackMapper.toTrackDetail(
-                            track.getId(),
-                            track.getIsrc(),
-                            track.getCreatedAt(),
-                            track.getLocation().getLongitude(),
-                            track.getLocation().getLatitude(),
-                            track.getLocation().getPlaceName(),
-                            track.getLocation().getAddress(),
-                            track.getImageUrl(),
-                            track.getContent(),
-                            trackLikeRepository.countByTrack(track),
-                            trackLikeRepository.existsByMemberAndTrack(member, track),
-                            memberInfo
-                    );
+                    return getTrackDetail(member, track);
                 })
                 .collect(Collectors.toList());
 
         return trackMapper.toTrackDetailList(trackDetails);
+    }
+
+    private TrackDetail getTrackDetail(Member member, Track track) {
+        TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
+                track.getMember().getId(),
+                track.getMember().getNickname(),
+                track.getMember().getAvatar()
+        );
+
+        return trackMapper.toTrackDetail(
+                track.getId(),
+                track.getIsrc(),
+                track.getCreatedAt(),
+                track.getLocation().getLatitude(),
+                track.getLocation().getLongitude(),
+                track.getLocation().getPlaceName(),
+                track.getLocation().getAddress(),
+                track.getImageUrl(),
+                track.getContent(),
+                trackLikeRepository.countByTrack(track),
+                trackLikeRepository.existsByMemberAndTrack(member, track),
+                memberInfo
+        );
     }
 
     @Override

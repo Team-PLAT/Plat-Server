@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TrackMapper {
-    public TrackResponse.TrackMap toTrackMap(Long trackId, String isrc, Boolean isLiked, Double longitude, Double latitude) {
+    public TrackResponse.TrackMap toTrackMap(Long trackId, String isrc, Boolean isLiked, Double latitude, Double longitude) {
         return TrackResponse.TrackMap.builder()
                 .trackId(trackId)
                 .isrc(isrc)
                 .isLiked(isLiked)
-                .longitude(longitude)
                 .latitude(latitude)
+                .longitude(longitude)
                 .build();
     }
 

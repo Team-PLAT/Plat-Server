@@ -14,7 +14,7 @@ public interface TrackRepository extends JpaRepository<Track, Long> {
             "AND l.longitude BETWEEN :minLongitude AND :maxLongitude",
             nativeQuery = true)
     List<Track> findAllTracksWithinBounds(@Param("minLatitude") double minLatitude,
-                                          @Param("minLongitude") double minLongitude,
                                           @Param("maxLatitude") double maxLatitude,
+                                          @Param("minLongitude") double minLongitude,
                                           @Param("maxLongitude") double maxLongitude);
 }
