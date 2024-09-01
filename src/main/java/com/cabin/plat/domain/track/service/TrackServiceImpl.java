@@ -125,7 +125,34 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.TrackDetailList getTrackFeeds(Member member) {
-        return null;
+        List<Track> tracks = trackRepository.findAll(); // TODO: 페이지네이션 또는 친구 트랙만 불러오기
+
+        List<TrackResponse.TrackDetail> trackDetails = tracks.stream()
+                .map(track -> {
+                    TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
+                            track.getMember().getId(),
+                            track.getMember().getNickname(),
+                            track.getMember().getAvatar()
+                    );
+
+                    return trackMapper.toTrackDetail(
+                            track.getId(),
+                            track.getIsrc(),
+                            track.getCreatedAt(),
+                            track.getLocation().getLongitude(),
+                            track.getLocation().getLatitude(),
+                            track.getLocation().getPlaceName(),
+                            track.getLocation().getAddress(),
+                            track.getImageUrl(),
+                            track.getContent(),
+                            trackLikeRepository.countByTrack(track),
+                            trackLikeRepository.existsByMemberAndTrack(member, track),
+                            memberInfo
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return trackMapper.toTrackDetailList(trackDetails);
     }
 
     @Override
