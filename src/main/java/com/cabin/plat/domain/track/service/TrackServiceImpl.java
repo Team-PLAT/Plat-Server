@@ -108,9 +108,7 @@ public class TrackServiceImpl implements TrackService {
         List<Track> tracks = trackRepository.findAll(); // TODO: 페이지네이션 또는 친구 트랙만 불러오기
 
         List<TrackResponse.TrackDetail> trackDetails = tracks.stream()
-                .map(track -> {
-                    return getTrackDetail(member, track);
-                })
+                .map(track -> getTrackDetail(member, track))
                 .collect(Collectors.toList());
 
         return trackMapper.toTrackDetailList(trackDetails);
@@ -141,7 +139,7 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.ReportId reportTrack(Member member, Long trackId) {
-        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+        trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
 
         TrackReport trackReport = TrackReport.builder()
                 .reportTrackId(trackId)
