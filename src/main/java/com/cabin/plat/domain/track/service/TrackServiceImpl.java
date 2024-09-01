@@ -4,9 +4,7 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
-import com.cabin.plat.domain.track.entity.Location;
-import com.cabin.plat.domain.track.entity.Track;
-import com.cabin.plat.domain.track.entity.TrackLike;
+import com.cabin.plat.domain.track.entity.*;
 import com.cabin.plat.domain.track.mapper.TrackMapper;
 import com.cabin.plat.domain.track.repository.*;
 import com.cabin.plat.global.exception.RestApiException;
@@ -157,6 +155,15 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.ReportId reportTrack(Member member, Long trackId) {
-        return null;
+        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+
+        TrackReport trackReport = TrackReport.builder()
+                .reportTrackId(trackId)
+                .reportMemberId(member.getId())
+                .build();
+
+        TrackReport savedTrackReport = trackReportRepository.save(trackReport);
+
+        return trackMapper.toReportId(savedTrackReport.getId());
     }
 }

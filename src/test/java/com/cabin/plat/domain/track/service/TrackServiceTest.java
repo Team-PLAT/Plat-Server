@@ -11,10 +11,13 @@ import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackMap;
 import com.cabin.plat.domain.track.entity.Location;
 import com.cabin.plat.domain.track.entity.Track;
+import com.cabin.plat.domain.track.entity.TrackReport;
 import com.cabin.plat.domain.track.repository.LocationRepository;
+import com.cabin.plat.domain.track.repository.TrackReportRepository;
 import com.cabin.plat.domain.track.repository.TrackRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,6 +40,9 @@ class TrackServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private TrackReportRepository trackReportRepository;
 
     private List<Member> members;
     private List<Location> locations;
@@ -285,6 +291,21 @@ class TrackServiceTest {
 
     @Test
     void 트랙_신고() {
-//        trackService.reportTrack();
+        // given
+        Long trackId = tracks.get(0).getId();
+        Member member1 = members.get(1);
+
+        // when
+        TrackResponse.ReportId reportIdResponse = trackService.reportTrack(member1, trackId);
+        Long reportId = reportIdResponse.getReportId();
+
+        // then
+        Optional<TrackReport> savedTrackReport = trackReportRepository.findById(reportId);
+
+        assertThat(savedTrackReport.isPresent()).isTrue();
+        assertThat(savedTrackReport.get().getReportTrackId()).isEqualTo(trackId);
+        assertThat(savedTrackReport.get().getReportMemberId()).isEqualTo(member1.getId());
+
+        assertThat(reportIdResponse.getReportId()).isEqualTo(savedTrackReport.get().getId());
     }
 }

@@ -17,7 +17,7 @@ public class TrackReport extends BaseEntity {
     @Column(name = "track_report_id")
     private Long id;
 
-    private String reportTrackId;
+    private Long reportTrackId;
 
-    private String reportMemberId;
+    private Long reportMemberId;
 }
