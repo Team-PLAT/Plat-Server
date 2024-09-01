@@ -1,7 +1,6 @@
 package com.cabin.plat.domain.track.service;
 
 import com.cabin.plat.domain.member.entity.Member;
-import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
@@ -12,26 +11,27 @@ import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class TrackServiceImpl implements TrackService {
-
     private final TrackRepository trackRepository;
-    private final MemberRepository memberRepository;
     private final LocationRepository locationRepository;
     private final TrackLikeRepository trackLikeRepository;
     private final TrackReportRepository trackReportRepository;
     private final TrackMapper trackMapper;
 
     @Override
-    public TrackResponse.TrackMapList getTracksByLocation(Member member, double startLatitude, double startLongitude,
-                                                          double endLatitude, double endLongitude) {
+    public TrackResponse.TrackMapList getTracksByLocation(
+            Member member,
+            double startLatitude,
+            double startLongitude,
+            double endLatitude,
+            double endLongitude) {
+
         // 좌표 재정렬
         double minLatitude = Math.min(startLatitude, endLatitude);
         double maxLatitude = Math.max(startLatitude, endLatitude);
@@ -39,7 +39,10 @@ public class TrackServiceImpl implements TrackService {
         double maxLongitude = Math.max(startLongitude, endLongitude);
 
         List<Track> tracks = trackRepository.findAllTracksWithinBounds(
-                minLatitude, maxLatitude, minLongitude, maxLongitude);
+                minLatitude,
+                maxLatitude,
+                minLongitude,
+                maxLongitude);
 
         List<TrackResponse.TrackMap> trackMaps = tracks.stream()
                 .map(track -> trackMapper.toTrackMap(
@@ -55,23 +58,23 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.TrackDetail getTrackById(Member member, Long trackId) {
-        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
-        return getTrackDetail(member, track);
+        Track track = trackRepository.findById(trackId)
+                .orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
 
+        return getTrackDetail(member, track);
     }
 
+    @Transactional
     @Override
     public TrackResponse.TrackId likeTrack(Member member, Long trackId, Boolean isLiked) {
-        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+        Track track = trackRepository.findById(trackId)
+                .orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
 
         Optional<TrackLike> existingLike = trackLikeRepository.findByMemberAndTrack(member, track);
 
         if (isLiked) {
             if (existingLike.isEmpty()) {
-                TrackLike trackLike = TrackLike.builder()
-                        .member(member)
-                        .track(track)
-                        .build();
+                TrackLike trackLike = trackMapper.toTrackLike(member, track);
                 trackLikeRepository.save(trackLike);
             }
         } else {
@@ -81,22 +84,16 @@ public class TrackServiceImpl implements TrackService {
         return trackMapper.toTrackId(trackId);
     }
 
+    @Transactional
     @Override
     public TrackResponse.TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload) {
-        Location location = locationRepository.save(Location.builder()
-                .placeName("장소 이름 (미구현)") // TODO: 장소 이름
-                .address("주소 (미구현)") // TODO: 위도 경도로 주소 받아오기
-                .latitude(trackUpload.getLatitude())
-                .longitude(trackUpload.getLongitude())
-                .build());
+        Location location = locationRepository.save(trackMapper.toLocation(
+                "장소 이름 (미구현)" ,// TODO: 장소 이름
+                "주소 (미구현)", // TODO: 위도 경도로 주소 받아오기
+                trackUpload.getLatitude(),
+                trackUpload.getLongitude()));
 
-        Track track = Track.builder()
-                .member(member)
-                .location(location)
-                .isrc(trackUpload.getIsrc())
-                .content(trackUpload.getContext())
-                .imageUrl(trackUpload.getImageUrl())
-                .build();
+        Track track = trackMapper.toTrack(member, location, trackUpload);
 
         Track savedTrack = trackRepository.save(track);
 
@@ -109,7 +106,7 @@ public class TrackServiceImpl implements TrackService {
 
         List<TrackResponse.TrackDetail> trackDetails = tracks.stream()
                 .map(track -> getTrackDetail(member, track))
-                .collect(Collectors.toList());
+                .toList();
 
         return trackMapper.toTrackDetailList(trackDetails);
     }
@@ -137,14 +134,13 @@ public class TrackServiceImpl implements TrackService {
         );
     }
 
+    @Transactional
     @Override
     public TrackResponse.ReportId reportTrack(Member member, Long trackId) {
-        trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+        trackRepository.findById(trackId)
+                .orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
 
-        TrackReport trackReport = TrackReport.builder()
-                .reportTrackId(trackId)
-                .reportMemberId(member.getId())
-                .build();
+        TrackReport trackReport = trackMapper.toTrackReport(trackId, member.getId());
 
         TrackReport savedTrackReport = trackReportRepository.save(trackReport);
 

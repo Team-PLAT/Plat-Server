@@ -7,14 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TrackRepository extends JpaRepository<Track, Long> {
-    @Query(value = "SELECT t.* " +
+    @Query(value =
+            "SELECT t.* " +
             "FROM track t " +
             "JOIN location l ON t.location_id = l.location_id " +
             "WHERE l.latitude BETWEEN :minLatitude AND :maxLatitude " +
             "AND l.longitude BETWEEN :minLongitude AND :maxLongitude",
             nativeQuery = true)
-    List<Track> findAllTracksWithinBounds(@Param("minLatitude") double minLatitude,
-                                          @Param("maxLatitude") double maxLatitude,
-                                          @Param("minLongitude") double minLongitude,
-                                          @Param("maxLongitude") double maxLongitude);
+    List<Track> findAllTracksWithinBounds(
+            @Param("minLatitude") double minLatitude,
+            @Param("maxLatitude") double maxLatitude,
+            @Param("minLongitude") double minLongitude,
+            @Param("maxLongitude") double maxLongitude);
 }

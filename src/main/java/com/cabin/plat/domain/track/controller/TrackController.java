@@ -19,11 +19,12 @@ public class TrackController {
 
     @Operation(summary = "트랙 맵 조회", description = "시작점과 끝점의 위도, 경도를 받아서 좌표값 범위 내부의 모든 트랙의 (아이디, isrc, 좋아요 여부, 위도, 경도)정보를 반환한다.")
     @GetMapping("/map")
-    public BaseResponse<TrackResponse.TrackMapList> getTracksByLocation(@AuthMember Member member,
-                                                                       @RequestParam double startLatitude,
-                                                                       @RequestParam double startLongitude,
-                                                                       @RequestParam double endLatitude,
-                                                                       @RequestParam double endLongitude) {
+    public BaseResponse<TrackResponse.TrackMapList> getTracksByLocation(
+            @AuthMember Member member,
+            @RequestParam double startLatitude,
+            @RequestParam double startLongitude,
+            @RequestParam double endLatitude,
+            @RequestParam double endLongitude) {
         return BaseResponse.onSuccess(trackService.getTracksByLocation(
                 member,
                 startLatitude,
@@ -40,19 +41,22 @@ public class TrackController {
             + "context: : 본문  "
             + "likeCount: 트랙의 총 좋아요 개수  "
             + "isLiked : 사용자가 좋아요를 눌렀는지 여부")
-    @GetMapping("/{track-id}")
-    public BaseResponse<TrackResponse.TrackDetail> getTrackById(@AuthMember Member member, @PathVariable("track-id") Long trackId) {
+    @GetMapping("/{trackId}")
+    public BaseResponse<TrackResponse.TrackDetail> getTrackById(@AuthMember Member member, @PathVariable("trackId") Long trackId) {
         return BaseResponse.onSuccess(trackService.getTrackById(member, trackId));
     }
 
     @Operation(summary = "트랙 좋아요 표시", description = "트랙에 사용자의 좋아요를 표시한다. idLiked 가 True 면 좋아요, False 면 좋아요 취소 이다.")
-    @PostMapping("/{track-id}/like")
-    public BaseResponse<TrackResponse.TrackId> likeTrack(@AuthMember Member member, @PathVariable("track-id") Long trackId, @RequestBody TrackRequest.TrackLike trackLike) {
+    @PostMapping("/{trackId}/like")
+    public BaseResponse<TrackResponse.TrackId> likeTrack(
+            @AuthMember Member member,
+            @PathVariable("trackId") Long trackId,
+            @RequestBody TrackRequest.TrackLike trackLike) {
         return BaseResponse.onSuccess(trackService.likeTrack(member, trackId, trackLike.getIsLiked()));
     }
 
     @Operation(summary = "트랙 게시", description = "트랙 (게시물)을 게시한다.")
-    @PostMapping("/")
+    @PostMapping
     public BaseResponse<TrackResponse.TrackId> addTrack(@AuthMember Member member, @RequestBody TrackRequest.TrackUpload trackUpload) {
         return BaseResponse.onSuccess(trackService.addTrack(member, trackUpload));
     }
@@ -64,8 +68,8 @@ public class TrackController {
     }
 
     @Operation(summary = "트랙 신고", description = "트랙을 신고한다.")
-    @PostMapping("/{track-id}/report")
-    public BaseResponse<TrackResponse.ReportId> reportTrack(@AuthMember Member member, @PathVariable("track-id") Long trackId) {
+    @PostMapping("/{trackId}/report")
+    public BaseResponse<TrackResponse.ReportId> reportTrack(@AuthMember Member member, @PathVariable("trackId") Long trackId) {
         return BaseResponse.onSuccess(trackService.reportTrack(member, trackId));
     }
 }

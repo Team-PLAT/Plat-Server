@@ -7,11 +7,12 @@ import com.cabin.plat.domain.track.dto.TrackResponse.TrackMapList;
 import com.cabin.plat.global.common.BaseResponse;
 
 public interface TrackService {
-    TrackResponse.TrackMapList getTracksByLocation(Member member,
-                                                   double startLatitude,
-                                                   double startLongitude,
-                                                   double endLatitude,
-                                                   double endLongitude
+    TrackResponse.TrackMapList getTracksByLocation(
+            Member member,
+            double startLatitude,
+            double startLongitude,
+            double endLatitude,
+            double endLongitude
     );
 
     TrackResponse.TrackDetail getTrackById(Member member, Long trackId);
