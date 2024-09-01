@@ -4,14 +4,14 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
-import com.cabin.plat.domain.track.dto.TrackResponse.*;
 import com.cabin.plat.domain.track.entity.Track;
+import com.cabin.plat.domain.track.entity.TrackLike;
 import com.cabin.plat.domain.track.mapper.TrackMapper;
 import com.cabin.plat.domain.track.repository.*;
 import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,7 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.TrackDetail getTrackById(Member member, Long trackId) {
-        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.MEMBER_NOT_FOUND));
+        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
         TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
                 track.getMember().getId(),
                 track.getMember().getNickname(),
@@ -81,7 +81,23 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.TrackId likeTrack(Member member, Long trackId, Boolean isLiked) {
-        return null;
+        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+
+        Optional<TrackLike> existingLike = trackLikeRepository.findByMemberAndTrack(member, track);
+
+        if (isLiked) {
+            if (existingLike.isEmpty()) {
+                TrackLike trackLike = TrackLike.builder()
+                        .member(member)
+                        .track(track)
+                        .build();
+                trackLikeRepository.save(trackLike);
+            }
+        } else {
+            existingLike.ifPresent(trackLikeRepository::delete);
+        }
+
+        return trackMapper.toTrackId(trackId);
     }
 
     @Override
