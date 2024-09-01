@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TrackLikeRepository extends JpaRepository<TrackLike, Long> {
     boolean existsByMemberAndTrack(Member member, Track track);
+    int countByTrack(Track track);
 }

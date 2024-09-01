@@ -8,6 +8,8 @@ import com.cabin.plat.domain.track.dto.TrackResponse.*;
 import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.mapper.TrackMapper;
 import com.cabin.plat.domain.track.repository.*;
+import com.cabin.plat.global.exception.RestApiException;
+import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ public class TrackServiceImpl implements TrackService {
     @Override
     public TrackResponse.TrackMapList getTracksByLocation(Member member, double startLatitude, double startLongitude,
                                                           double endLatitude, double endLongitude) {
+        // 좌표 재정렬
         double minLatitude = Math.min(startLatitude, endLatitude);
         double maxLatitude = Math.max(startLatitude, endLatitude);
         double minLongitude = Math.min(startLongitude, endLongitude);
@@ -52,7 +55,28 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.TrackDetail getTrackById(Member member, Long trackId) {
-        return null;
+        Track track = trackRepository.findById(trackId).orElseThrow(() -> new RestApiException(TrackErrorCode.MEMBER_NOT_FOUND));
+        TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
+                track.getMember().getId(),
+                track.getMember().getNickname(),
+                track.getMember().getAvatar()
+        );
+
+        return trackMapper.toTrackDetail(
+                track.getId(),
+                track.getIsrc(),
+                track.getCreatedAt(),
+                track.getLocation().getLatitude(),
+                track.getLocation().getLongitude(),
+                track.getLocation().getPlaceName(),
+                track.getLocation().getAddress(),
+                track.getImageUrl(),
+                track.getContent(),
+                trackLikeRepository.countByTrack(track),
+                trackLikeRepository.existsByMemberAndTrack(member, track),
+                memberInfo
+        );
+
     }
 
     @Override

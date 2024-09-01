@@ -28,12 +28,12 @@ public class TrackMapper {
     public TrackResponse.TrackDetail toTrackDetail(Long trackId,
                                                    String isrc,
                                                    LocalDateTime createdAt,
-                                                   Double longitude,
                                                    Double latitude,
+                                                   Double longitude,
                                                    String locationString,
                                                    String address,
                                                    String imageUrl,
-                                                   String context,
+                                                   String content,
                                                    int likeCount,
                                                    Boolean isLiked,
                                                    TrackResponse.MemberInfo memberInfo) {
@@ -42,12 +42,12 @@ public class TrackMapper {
                 .trackId(trackId)
                 .isrc(isrc)
                 .createdAt(createdAt)
-                .longitude(longitude)
                 .latitude(latitude)
+                .longitude(longitude)
                 .locationString(locationString)
                 .address(address)
                 .imageUrl(imageUrl)
-                .context(context)
+                .context(content)
                 .likeCount(likeCount)
                 .isLiked(isLiked)
                 .member(memberInfo)

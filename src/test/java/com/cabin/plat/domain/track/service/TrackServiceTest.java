@@ -152,6 +152,7 @@ class TrackServiceTest {
     @Test
     void 트랙_아이디로_트랙_디테일_조회() {
         // given
+        Long trackId = tracks.get(0).getId();
         TrackResponse.MemberInfo memberInfo = TrackResponse.MemberInfo.builder()
                 .memberId(members.get(0).getId())
                 .memberNickname(members.get(0).getNickname())
@@ -159,9 +160,10 @@ class TrackServiceTest {
                 .build();
 
         TrackResponse.TrackDetail expectedTrackDetail = TrackResponse.TrackDetail.builder()
+                .trackId(trackId)
                 .isrc("isrc1")
-                .longitude(36.017062)
-                .latitude(129.321993)
+                .latitude(36.017062)
+                .longitude(129.321993)
                 .locationString("Dormitory 16 (DICE)")
                 .address("경상북도 포항시 남구 지곡동 287")
                 .imageUrl("https://testimage1.com")
@@ -172,7 +174,6 @@ class TrackServiceTest {
                 .build();
 
         // when
-        Long trackId = tracks.get(0).getId();
         TrackResponse.TrackDetail trackDetail = trackService.getTrackById(members.get(0), trackId);
 
         // then
@@ -221,12 +222,13 @@ class TrackServiceTest {
         @Test
         void 트랙_좋아요_취소() {
             // when
+            trackService.likeTrack(member0, trackId, true); // 멤버0이 멤버0이 올린 트랙 좋아요 표시
             trackService.likeTrack(member1, trackId, true); // 멤버1이 멤버0이 올린 트랙 좋아요 표시
             trackService.likeTrack(member1, trackId, false); // 멤버1이 멤버0이 올린 트랙 좋아요 취소
             TrackResponse.TrackDetail trackDetail0 = trackService.getTrackById(member1, trackId); // 멤버1이 조회
 
             // then
-            assertThat(trackDetail0.getLikeCount()).isZero();
+            assertThat(trackDetail0.getLikeCount()).isEqualTo(1);
         }
 
         @Test
