@@ -1,6 +1,7 @@
 package com.cabin.plat.domain.track.service;
 
 import com.cabin.plat.domain.member.entity.Member;
+import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,7 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    public TrackId addTrack(Member member, String isrc, String imageUrl, String context, double latitude,
-                            double longitude) {
+    public TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload) {
         return null;
     }
 

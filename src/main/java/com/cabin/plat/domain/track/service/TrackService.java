@@ -1,6 +1,7 @@
 package com.cabin.plat.domain.track.service;
 
 import com.cabin.plat.domain.member.entity.Member;
+import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackMapList;
 import com.cabin.plat.global.common.BaseResponse;
@@ -17,13 +18,7 @@ public interface TrackService {
 
     TrackResponse.TrackId likeTrack(Member member, String trackId, Boolean isLiked);
 
-    TrackResponse.TrackId addTrack(Member member,
-                                   String isrc,
-                                   String imageUrl,
-                                   String context,
-                                   double latitude,
-                                   double longitude
-    );
+    TrackResponse.TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload);
 
     TrackResponse.TrackDetailList getTrackFeeds(Member member);
 

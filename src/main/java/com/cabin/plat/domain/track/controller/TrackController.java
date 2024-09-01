@@ -54,13 +54,7 @@ public class TrackController {
     @Operation(summary = "트랙 게시", description = "트랙 (게시물)을 게시한다.")
     @PostMapping("/")
     public BaseResponse<TrackResponse.TrackId> addTrack(@AuthMember Member member, @RequestBody TrackRequest.TrackUpload trackUpload) {
-        return BaseResponse.onSuccess(trackService.addTrack(member,
-                trackUpload.getIsrc(),
-                trackUpload.getImageUrl(),
-                trackUpload.getContext(),
-                trackUpload.getLatitude(),
-                trackUpload.getLongitude()
-        ));
+        return BaseResponse.onSuccess(trackService.addTrack(member, trackUpload));
     }
 
     @Operation(summary = "트랙 피드 조회", description = "트랙의 피드를 모두 조회한다.")
