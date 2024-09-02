@@ -1,6 +1,5 @@
 package com.cabin.plat.domain.track.mapper;
 
-import com.cabin.plat.domain.member.dto.MemberResponse;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
@@ -57,7 +56,7 @@ public class TrackMapper {
                 .locationString(locationString)
                 .address(address)
                 .imageUrl(imageUrl)
-                .context(content)
+                .content(content)
                 .likeCount(likeCount)
                 .isLiked(isLiked)
                 .member(memberInfo)
@@ -111,7 +110,7 @@ public class TrackMapper {
                 .member(member)
                 .location(location)
                 .isrc(trackUpload.getIsrc())
-                .content(trackUpload.getContext())
+                .content(trackUpload.getContent())
                 .imageUrl(trackUpload.getImageUrl())
                 .build();
     }

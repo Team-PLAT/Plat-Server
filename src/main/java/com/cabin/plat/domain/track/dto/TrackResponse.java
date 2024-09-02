@@ -48,7 +48,7 @@ public class TrackResponse {
         private String locationString;
         private String address;
         private String imageUrl;
-        private String context;
+        private String content;
         private int likeCount;
         private Boolean isLiked;
         private MemberInfo member;

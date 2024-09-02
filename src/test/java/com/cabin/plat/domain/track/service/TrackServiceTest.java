@@ -1,6 +1,5 @@
 package com.cabin.plat.domain.track.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 import com.cabin.plat.domain.member.entity.*;
@@ -8,7 +7,6 @@ import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
-import com.cabin.plat.domain.track.dto.TrackResponse.TrackMap;
 import com.cabin.plat.domain.track.entity.Location;
 import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.entity.TrackReport;
@@ -173,7 +171,7 @@ class TrackServiceTest {
                 .locationString("Dormitory 16 (DICE)")
                 .address("경상북도 포항시 남구 지곡동 287")
                 .imageUrl("https://testimage1.com")
-                .context("기숙사에서 한곡")
+                .content("기숙사에서 한곡")
                 .likeCount(0)
                 .isLiked(false)
                 .member(memberInfo)
@@ -257,7 +255,7 @@ class TrackServiceTest {
         TrackRequest.TrackUpload trackUpload = TrackRequest.TrackUpload.builder()
                 .isrc("isrc9")
                 .imageUrl("https://testimage9.com")
-                .context("테스트9")
+                .content("테스트9")
                 .latitude(12.131)
                 .longitude(123.123)
                 .build();
@@ -269,7 +267,7 @@ class TrackServiceTest {
         TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member, trackId);
         assertThat(trackDetail.getIsrc()).isEqualTo("isrc9");
         assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage9.com");
-        assertThat(trackDetail.getContext()).isEqualTo("테스트9");
+        assertThat(trackDetail.getContent()).isEqualTo("테스트9");
         assertThat(trackDetail.getLatitude()).isEqualTo(12.131);
         assertThat(trackDetail.getLongitude()).isEqualTo(123.123);
         assertThat(trackDetail.getLikeCount()).isZero();
