@@ -1,6 +1,5 @@
 package com.cabin.plat.domain.track.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 import com.cabin.plat.domain.member.entity.*;
@@ -8,7 +7,6 @@ import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
-import com.cabin.plat.domain.track.dto.TrackResponse.TrackMap;
 import com.cabin.plat.domain.track.entity.Location;
 import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.entity.TrackReport;
@@ -173,7 +171,7 @@ class TrackServiceTest {
                 .locationString("Dormitory 16 (DICE)")
                 .address("경상북도 포항시 남구 지곡동 287")
                 .imageUrl("https://testimage1.com")
-                .context("기숙사에서 한곡")
+                .content("기숙사에서 한곡")
                 .likeCount(0)
                 .isLiked(false)
                 .member(memberInfo)
@@ -184,7 +182,16 @@ class TrackServiceTest {
 
         // then
         assertThat(trackDetail).isNotNull();
-        assertThat(trackDetail).usingRecursiveComparison().isEqualTo(expectedTrackDetail);
+        assertThat(trackDetail.getIsrc()).isEqualTo("isrc1");
+        assertThat(trackDetail.getLatitude()).isEqualTo(36.017062);
+        assertThat(trackDetail.getLongitude()).isEqualTo(129.321993);
+        assertThat(trackDetail.getLocationString()).isEqualTo("Dormitory 16 (DICE)");
+        assertThat(trackDetail.getAddress()).isEqualTo("경상북도 포항시 남구 지곡동 287");
+        assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage1.com");
+        assertThat(trackDetail.getContent()).isEqualTo("기숙사에서 한곡");
+        assertThat(trackDetail.getLikeCount()).isEqualTo(0);
+        assertThat(trackDetail.getIsLiked()).isEqualTo(false);
+        assertThat(trackDetail.getMember()).usingRecursiveComparison().isEqualTo(memberInfo);
     }
 
     @Nested
@@ -250,6 +257,7 @@ class TrackServiceTest {
         }
     }
 
+    // MARK: 해당 테스트는 외부 API (역지오코딩) 에 종속적입니다.
     @Test
     void 트랙_게시() {
         // given
@@ -257,9 +265,9 @@ class TrackServiceTest {
         TrackRequest.TrackUpload trackUpload = TrackRequest.TrackUpload.builder()
                 .isrc("isrc9")
                 .imageUrl("https://testimage9.com")
-                .context("테스트9")
-                .latitude(12.131)
-                .longitude(123.123)
+                .content("테스트9")
+                .latitude(36.014188)
+                .longitude(129.325802)
                 .build();
 
         // when
@@ -269,9 +277,11 @@ class TrackServiceTest {
         TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member, trackId);
         assertThat(trackDetail.getIsrc()).isEqualTo("isrc9");
         assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage9.com");
-        assertThat(trackDetail.getContext()).isEqualTo("테스트9");
-        assertThat(trackDetail.getLatitude()).isEqualTo(12.131);
-        assertThat(trackDetail.getLongitude()).isEqualTo(123.123);
+        assertThat(trackDetail.getContent()).isEqualTo("테스트9");
+        assertThat(trackDetail.getLatitude()).isEqualTo(36.014188);
+        assertThat(trackDetail.getLongitude()).isEqualTo(129.325802);
+        assertThat(trackDetail.getAddress()).isEqualTo("경상북도 포항시 남구 지곡동");
+        assertThat(trackDetail.getLocationString()).isEqualTo("포항공대제1융합관");
         assertThat(trackDetail.getLikeCount()).isZero();
         assertThat(trackDetail.getIsLiked()).isFalse();
         assertThat(trackDetail.getMember().getMemberId()).isEqualTo(member.getId());

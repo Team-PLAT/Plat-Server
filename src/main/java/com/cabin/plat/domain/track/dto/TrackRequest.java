@@ -19,7 +19,7 @@ public class TrackRequest {
     public static class TrackUpload {
         private String isrc;
         private String imageUrl;
-        private String context;
+        private String content;
         private double latitude;
         private double longitude;
     }

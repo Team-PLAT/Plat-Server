@@ -9,8 +9,12 @@ import com.cabin.plat.domain.track.mapper.TrackMapper;
 import com.cabin.plat.domain.track.repository.*;
 import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
+import com.cabin.plat.global.util.geocoding.AddressInfo;
+import com.cabin.plat.global.util.geocoding.ApiKeyProperties;
+import com.cabin.plat.global.util.geocoding.ReverseGeoCoding;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,7 @@ public class TrackServiceImpl implements TrackService {
     private final TrackLikeRepository trackLikeRepository;
     private final TrackReportRepository trackReportRepository;
     private final TrackMapper trackMapper;
+    private final ReverseGeoCoding reverseGeoCoding;
 
     @Override
     public TrackResponse.TrackMapList getTracksByLocation(
@@ -87,14 +92,17 @@ public class TrackServiceImpl implements TrackService {
     @Transactional
     @Override
     public TrackResponse.TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload) {
+        double latitude = trackUpload.getLatitude();
+        double longitude = trackUpload.getLongitude();
+        AddressInfo addressInfo = reverseGeoCoding.getAddressInfo(latitude, longitude);
+
         Location location = locationRepository.save(trackMapper.toLocation(
-                "장소 이름 (미구현)" ,// TODO: 장소 이름
-                "주소 (미구현)", // TODO: 위도 경도로 주소 받아오기
-                trackUpload.getLatitude(),
-                trackUpload.getLongitude()));
+                addressInfo.buildingName(),
+                addressInfo.toAddress(),
+                latitude,
+                longitude));
 
         Track track = trackMapper.toTrack(member, location, trackUpload);
-
         Track savedTrack = trackRepository.save(track);
 
         return trackMapper.toTrackId(savedTrack.getId());
