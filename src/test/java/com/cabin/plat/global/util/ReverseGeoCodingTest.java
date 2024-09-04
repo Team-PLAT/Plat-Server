@@ -5,9 +5,13 @@ import static org.assertj.core.api.Assertions.*;
 import com.cabin.plat.global.util.geocoding.AddressInfo;
 import com.cabin.plat.global.util.geocoding.ReverseGeoCoding;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
+@SpringBootTest
 class ReverseGeoCodingTest {
-    private final ReverseGeoCoding reverseGeoCoding = new ReverseGeoCoding();
+    @Autowired
+    private ReverseGeoCoding reverseGeoCoding;
 
     @Test
     void 주소O_도로명주소O_건물명O() {
