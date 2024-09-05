@@ -10,12 +10,14 @@ import com.cabin.plat.domain.track.repository.*;
 import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import com.cabin.plat.global.util.geocoding.AddressInfo;
-import com.cabin.plat.global.util.geocoding.ApiKeyProperties;
 import com.cabin.plat.global.util.geocoding.ReverseGeoCoding;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,8 +111,12 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    public TrackResponse.TrackDetailList getTrackFeeds(Member member) {
-        List<Track> tracks = trackRepository.findAll(); // TODO: 페이지네이션 또는 친구 트랙만 불러오기
+    public TrackResponse.TrackDetailList getTrackFeeds(Member member, int page, int size) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sorts));
+
+        List<Track> tracks = trackRepository.findAll(pageable).getContent();
 
         List<TrackResponse.TrackDetail> trackDetails = tracks.stream()
                 .map(track -> getTrackDetail(member, track))

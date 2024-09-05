@@ -4,12 +4,17 @@ import com.cabin.plat.config.AuthMember;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
+import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tracks")
@@ -61,10 +66,13 @@ public class TrackController {
         return BaseResponse.onSuccess(trackService.addTrack(member, trackUpload));
     }
 
-    @Operation(summary = "트랙 피드 조회", description = "트랙의 피드를 모두 조회한다.")
+    @Operation(summary = "트랙 피드 조회", description = "트랙의 피드를 조회한다. 페이지네이션을 지원합니다. page 파라미터에 페이지 번호를 입력해주세요.")
     @GetMapping("/feeds")
-    public BaseResponse<TrackResponse.TrackDetailList> getTrackFeeds(@AuthMember Member member) {
-        return BaseResponse.onSuccess(trackService.getTrackFeeds(member));
+    public BaseResponse<TrackResponse.TrackDetailList> getTrackFeeds(
+            @AuthMember Member member,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return BaseResponse.onSuccess(trackService.getTrackFeeds(member, page, size));
     }
 
     @Operation(summary = "트랙 신고", description = "트랙을 신고한다.")
