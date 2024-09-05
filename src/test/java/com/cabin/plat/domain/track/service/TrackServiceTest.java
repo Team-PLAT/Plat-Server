@@ -293,10 +293,26 @@ class TrackServiceTest {
         Member member = members.get(0);
 
         // when
-        List<TrackDetail> trackDetails = trackService.getTrackFeeds(member).getTrackDetails();
+        List<TrackDetail> trackDetails = trackService.getTrackFeeds(member, 0, 20).getTrackDetails();
 
         // then
         assertThat(trackDetails).hasSize(6);
+    }
+
+    @Test
+    void 트랙_피드_페이지네이션() {
+        // given
+        Member member = members.get(0);
+
+        // when
+        List<TrackDetail> firstPageTracks = trackService.getTrackFeeds(member, 0, 4).getTrackDetails();
+        List<TrackDetail> secondPageTracks = trackService.getTrackFeeds(member, 1, 4).getTrackDetails();
+        List<TrackDetail> thirdPageTracks = trackService.getTrackFeeds(member, 2, 4).getTrackDetails();
+
+        // then
+        assertThat(firstPageTracks).hasSize(4);
+        assertThat(secondPageTracks).hasSize(2);
+        assertThat(thirdPageTracks).hasSize(0);
     }
 
     @Test

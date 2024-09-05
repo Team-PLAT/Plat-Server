@@ -3,8 +3,6 @@ package com.cabin.plat.domain.track.service;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
-import com.cabin.plat.domain.track.dto.TrackResponse.TrackMapList;
-import com.cabin.plat.global.common.BaseResponse;
 
 public interface TrackService {
     TrackResponse.TrackMapList getTracksByLocation(
@@ -21,7 +19,7 @@ public interface TrackService {
 
     TrackResponse.TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload);
 
-    TrackResponse.TrackDetailList getTrackFeeds(Member member);
+    TrackResponse.TrackDetailList getTrackFeeds(Member member, int page, int size);
 
     TrackResponse.ReportId reportTrack(Member member, Long trackId);
 }
