@@ -7,6 +7,7 @@ import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,13 @@ public class TrackController {
     @GetMapping("/map")
     public BaseResponse<TrackResponse.TrackMapList> getTracksByLocation(
             @AuthMember Member member,
+            @Parameter(description = "시작 위도 값", example = "36.016512")
             @RequestParam double startLatitude,
+            @Parameter(description = "시작 경도 값", example = "129.321285")
             @RequestParam double startLongitude,
+            @Parameter(description = "끝 위도 값", example = "36.012527")
             @RequestParam double endLatitude,
+            @Parameter(description = "끝 경도 값", example = "129.328229")
             @RequestParam double endLongitude) {
         return BaseResponse.onSuccess(trackService.getTracksByLocation(
                 member,
