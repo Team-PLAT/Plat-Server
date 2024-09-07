@@ -4,15 +4,11 @@ import com.cabin.plat.config.AuthMember;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
-import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
