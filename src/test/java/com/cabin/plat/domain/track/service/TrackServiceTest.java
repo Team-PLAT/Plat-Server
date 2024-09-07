@@ -117,7 +117,7 @@ class TrackServiceTest {
         // Then
         var retrievedLocation = locationRepository.findById(location.getId());
         assertThat(retrievedLocation.isPresent()).isTrue();
-        assertThat(location.getPlaceName()).isEqualTo(retrievedLocation.get().getPlaceName());
+        assertThat(location.getBuildingName()).isEqualTo(retrievedLocation.get().getBuildingName());
         assertThat(location.getAddress()).isEqualTo(retrievedLocation.get().getAddress());
         assertThat(location.getLatitude()).isEqualTo(retrievedLocation.get().getLatitude());
         assertThat(location.getLongitude()).isEqualTo(retrievedLocation.get().getLongitude());
@@ -168,7 +168,7 @@ class TrackServiceTest {
                 .isrc("isrc1")
                 .latitude(36.017062)
                 .longitude(129.321993)
-                .locationString("Dormitory 16 (DICE)")
+                .buildingName("Dormitory 16 (DICE)")
                 .address("경상북도 포항시 남구 지곡동 287")
                 .imageUrl("https://testimage1.com")
                 .content("기숙사에서 한곡")
@@ -185,7 +185,7 @@ class TrackServiceTest {
         assertThat(trackDetail.getIsrc()).isEqualTo("isrc1");
         assertThat(trackDetail.getLatitude()).isEqualTo(36.017062);
         assertThat(trackDetail.getLongitude()).isEqualTo(129.321993);
-        assertThat(trackDetail.getLocationString()).isEqualTo("Dormitory 16 (DICE)");
+        assertThat(trackDetail.getBuildingName()).isEqualTo("Dormitory 16 (DICE)");
         assertThat(trackDetail.getAddress()).isEqualTo("경상북도 포항시 남구 지곡동 287");
         assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage1.com");
         assertThat(trackDetail.getContent()).isEqualTo("기숙사에서 한곡");
@@ -281,7 +281,7 @@ class TrackServiceTest {
         assertThat(trackDetail.getLatitude()).isEqualTo(36.014188);
         assertThat(trackDetail.getLongitude()).isEqualTo(129.325802);
         assertThat(trackDetail.getAddress()).isEqualTo("경상북도 포항시 남구 지곡동");
-        assertThat(trackDetail.getLocationString()).isEqualTo("포항공대제1융합관");
+        assertThat(trackDetail.getBuildingName()).isEqualTo("포항공대제1융합관");
         assertThat(trackDetail.getLikeCount()).isZero();
         assertThat(trackDetail.getIsLiked()).isFalse();
         assertThat(trackDetail.getMember().getMemberId()).isEqualTo(member.getId());

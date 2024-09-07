@@ -45,7 +45,7 @@ public class TrackResponse {
         private LocalDateTime createdAt;
         private Double latitude;
         private Double longitude;
-        private String locationString;
+        private String buildingName;
         private String address;
         private String imageUrl;
         private String content;
