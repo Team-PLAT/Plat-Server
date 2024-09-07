@@ -8,6 +8,7 @@ import com.cabin.plat.domain.member.entity.StreamType;
 import com.cabin.plat.domain.member.service.MemberService;
 import com.cabin.plat.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -47,7 +48,9 @@ public class MemberController {
     @Operation(summary = "유저 스트리밍 계정 선택 (변경)",
             description = "회원의 스트리밍 계정 정보를 업데이트합니다. `streamType` 파라미터를 통해 새로운 스트리밍 계정 유형을 전달합니다.")
     @PatchMapping("/profile/stream-type")
-    public BaseResponse<MemberResponse.MemberId> updateStreamType(@AuthMember Member member, @RequestParam StreamType streamType) {
+    public BaseResponse<MemberResponse.MemberId> updateStreamType(
+            @AuthMember Member member,
+            @RequestParam StreamType streamType) {
         return BaseResponse.onSuccess(memberService.updateStreamType(member, streamType));
     }
 

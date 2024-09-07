@@ -6,6 +6,7 @@ import com.cabin.plat.domain.address.service.AddressService;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,9 @@ public class AddressController {
     @GetMapping("/reverse-geocode")
     public BaseResponse<AddressResponse.AddressString> getAddress(
             @AuthMember Member member,
+            @Parameter(description = "위도 값", example = "36.014188")
             @RequestParam double latitude,
+            @Parameter(description = "경도 값", example = "129.325802")
             @RequestParam double longitude) {
         return BaseResponse.onSuccess(addressService.getAddress(latitude, longitude));
     }
