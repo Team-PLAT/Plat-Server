@@ -17,7 +17,7 @@ public class Location extends BaseEntity {
     @Column(name = "location_id")
     private Long id;
 
-    private String placeName;
+    private String buildingName;
 
     @Column(nullable = false)
     private String address;

@@ -138,7 +138,7 @@ public class TrackServiceImpl implements TrackService {
                 track.getCreatedAt(),
                 track.getLocation().getLatitude(),
                 track.getLocation().getLongitude(),
-                track.getLocation().getPlaceName(),
+                track.getLocation().getBuildingName(),
                 track.getLocation().getAddress(),
                 track.getImageUrl(),
                 track.getContent(),

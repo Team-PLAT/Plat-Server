@@ -39,7 +39,7 @@ public class TrackMapper {
             LocalDateTime createdAt,
             Double latitude,
             Double longitude,
-            String locationString,
+            String buildingName,
             String address,
             String imageUrl,
             String content,
@@ -53,7 +53,7 @@ public class TrackMapper {
                 .createdAt(createdAt)
                 .latitude(latitude)
                 .longitude(longitude)
-                .locationString(locationString)
+                .buildingName(buildingName)
                 .address(address)
                 .imageUrl(imageUrl)
                 .content(content)
@@ -96,9 +96,9 @@ public class TrackMapper {
                 .build();
     }
 
-    public Location toLocation(String placeName, String address, Double latitude, Double longitude) {
+    public Location toLocation(String buildingName, String address, Double latitude, Double longitude) {
         return Location.builder()
-                .placeName(placeName)
+                .buildingName(buildingName)
                 .address(address)
                 .latitude(latitude)
                 .longitude(longitude)

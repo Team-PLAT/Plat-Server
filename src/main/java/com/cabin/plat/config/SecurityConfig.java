@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/test").authenticated()
                         .requestMatchers("/members/**").authenticated()
                         .requestMatchers("/tracks/**").authenticated()
+                        .requestMatchers("address/**").authenticated()
                         .anyRequest().denyAll());
 
         http

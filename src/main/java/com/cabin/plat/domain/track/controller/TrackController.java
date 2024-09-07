@@ -4,15 +4,11 @@ import com.cabin.plat.config.AuthMember;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
-import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,13 +35,7 @@ public class TrackController {
         ));
     }
 
-    @Operation(summary = "트랙 디테일 조회", description = "트랙의 아이디로 트랙의 디테일한 정보를 조회합니다. "
-            + "locationString : 장소 이름 (없으면 빈 문자열)  "
-            + "address : 주소  "
-            + "imageUrl : 이미지 주소 (없으면 빈 문자열)  "
-            + "context: : 본문  "
-            + "likeCount: 트랙의 총 좋아요 개수  "
-            + "isLiked : 사용자가 좋아요를 눌렀는지 여부")
+    @Operation(summary = "트랙 디테일 조회", description = "트랙의 아이디로 트랙의 디테일한 정보를 조회합니다.")
     @GetMapping("/{trackId}")
     public BaseResponse<TrackResponse.TrackDetail> getTrackById(@AuthMember Member member, @PathVariable("trackId") Long trackId) {
         return BaseResponse.onSuccess(trackService.getTrackById(member, trackId));
