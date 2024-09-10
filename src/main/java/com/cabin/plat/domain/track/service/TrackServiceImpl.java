@@ -4,6 +4,7 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
+import com.cabin.plat.domain.track.dto.TrackResponse.TrackId;
 import com.cabin.plat.domain.track.entity.*;
 import com.cabin.plat.domain.track.mapper.TrackMapper;
 import com.cabin.plat.domain.track.repository.*;
@@ -65,8 +66,7 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse.TrackDetail getTrackById(Member member, Long trackId) {
-        Track track = trackRepository.findById(trackId)
-                .orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+        Track track = findTrackById(trackId);
 
         return getTrackDetail(member, track);
     }
@@ -74,8 +74,7 @@ public class TrackServiceImpl implements TrackService {
     @Transactional
     @Override
     public TrackResponse.TrackId likeTrack(Member member, Long trackId, Boolean isLiked) {
-        Track track = trackRepository.findById(trackId)
-                .orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+        Track track = findTrackById(trackId);
 
         Optional<TrackLike> existingLike = trackLikeRepository.findByMemberAndTrack(member, track);
 
@@ -125,6 +124,31 @@ public class TrackServiceImpl implements TrackService {
         return trackMapper.toTrackDetailList(trackDetails);
     }
 
+    @Override
+    @Transactional
+    public TrackId deleteTrack(Member member, Long trackId) {
+        Track track = findTrackById(trackId);
+        Long trackUploaderId = track.getMember().getId();
+        Long memberId = member.getId();
+        if (!trackUploaderId.equals(memberId)) {
+            throw new RestApiException(TrackErrorCode.TRACK_DELETE_FORBIDDEN);
+        }
+        track.delete();
+        return trackMapper.toTrackId(track.getId());
+    }
+
+    @Transactional
+    @Override
+    public TrackResponse.ReportId reportTrack(Member member, Long trackId) {
+        findTrackById(trackId);
+
+        TrackReport trackReport = trackMapper.toTrackReport(trackId, member.getId());
+
+        TrackReport savedTrackReport = trackReportRepository.save(trackReport);
+
+        return trackMapper.toReportId(savedTrackReport.getId());
+    }
+
     private TrackDetail getTrackDetail(Member member, Track track) {
         TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
                 track.getMember().getId(),
@@ -148,16 +172,8 @@ public class TrackServiceImpl implements TrackService {
         );
     }
 
-    @Transactional
-    @Override
-    public TrackResponse.ReportId reportTrack(Member member, Long trackId) {
-        trackRepository.findById(trackId)
+    private Track findTrackById(Long trackId) {
+        return trackRepository.findById(trackId)
                 .orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
-
-        TrackReport trackReport = trackMapper.toTrackReport(trackId, member.getId());
-
-        TrackReport savedTrackReport = trackReportRepository.save(trackReport);
-
-        return trackMapper.toReportId(savedTrackReport.getId());
     }
 }

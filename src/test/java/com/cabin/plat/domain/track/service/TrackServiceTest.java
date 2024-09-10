@@ -13,6 +13,8 @@ import com.cabin.plat.domain.track.entity.TrackReport;
 import com.cabin.plat.domain.track.repository.LocationRepository;
 import com.cabin.plat.domain.track.repository.TrackReportRepository;
 import com.cabin.plat.domain.track.repository.TrackRepository;
+import com.cabin.plat.global.exception.RestApiException;
+import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -163,20 +166,6 @@ class TrackServiceTest {
                 .avatar(members.get(0).getAvatar())
                 .build();
 
-        TrackResponse.TrackDetail expectedTrackDetail = TrackResponse.TrackDetail.builder()
-                .trackId(trackId)
-                .isrc("isrc1")
-                .latitude(36.017062)
-                .longitude(129.321993)
-                .buildingName("Dormitory 16 (DICE)")
-                .address("경상북도 포항시 남구 지곡동 287")
-                .imageUrl("https://testimage1.com")
-                .content("기숙사에서 한곡")
-                .likeCount(0)
-                .isLiked(false)
-                .member(memberInfo)
-                .build();
-
         // when
         TrackResponse.TrackDetail trackDetail = trackService.getTrackById(members.get(0), trackId);
 
@@ -195,7 +184,7 @@ class TrackServiceTest {
     }
 
     @Nested
-    class TrackLikeTests {
+    class 트랙_좋아요_테스트 {
 
         private Long trackId;
         private Member member0;
@@ -313,6 +302,36 @@ class TrackServiceTest {
         assertThat(firstPageTracks).hasSize(4);
         assertThat(secondPageTracks).hasSize(2);
         assertThat(thirdPageTracks).hasSize(0);
+    }
+
+    @Nested
+    class 트랙_삭제_테스트 {
+        @Test
+        void 트랙_삭제_성공() {
+            // given
+            Member uploader = members.get(0);
+            Long trackId = tracks.get(0).getId();
+
+            // when
+            TrackResponse.TrackId deletedTrackId = trackService.deleteTrack(uploader, trackId);
+
+            // then
+            assertThat(deletedTrackId.getTrackId()).isEqualTo(trackId);
+            Optional<Track> track = trackRepository.findById(trackId);
+            assertThat(track.isPresent()).isTrue();
+            assertThat(track.get().getDeletedAt()).isNotNull();
+        }
+
+        @Test
+        void 트랙_삭제_실패_권한없음() {
+            // given
+            Member nonUploader = members.get(2); // 다른 멤버
+            Long trackId = tracks.get(0).getId(); // 삭제하려는 트랙의 ID
+
+            // when, then
+            assertThatThrownBy(() -> trackService.deleteTrack(nonUploader, trackId))
+                    .isInstanceOf(RestApiException.class);
+        }
     }
 
     @Test

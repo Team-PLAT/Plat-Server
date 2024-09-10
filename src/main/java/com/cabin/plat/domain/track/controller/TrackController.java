@@ -70,6 +70,14 @@ public class TrackController {
         return BaseResponse.onSuccess(trackService.getTrackFeeds(member, page, size));
     }
 
+    @Operation(summary = "트랙 삭제", description = "트랙을 삭제한다.")
+    @DeleteMapping("/{trackId}")
+    public BaseResponse<TrackResponse.TrackId> deleteTrack(
+            @AuthMember Member member,
+            @PathVariable("trackId") Long trackId) {
+        return BaseResponse.onSuccess(trackService.deleteTrack(member, trackId));
+    }
+
     @Operation(summary = "트랙 신고", description = "트랙을 신고한다.")
     @PostMapping("/{trackId}/report")
     public BaseResponse<TrackResponse.ReportId> reportTrack(@AuthMember Member member, @PathVariable("trackId") Long trackId) {

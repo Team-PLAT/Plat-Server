@@ -10,7 +10,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum TrackErrorCode implements ErrorCodeInterface {
 
-    TRACK_NOT_FOUND("TRACK001", "Track가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    TRACK_NOT_FOUND("TRACK001", "Track이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    TRACK_DELETE_FORBIDDEN("TRACK002", "이 트랙을 삭제할 권한이 없습니다.", HttpStatus.FORBIDDEN),
     ;
 
     private final String code;

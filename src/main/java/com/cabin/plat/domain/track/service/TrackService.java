@@ -21,5 +21,7 @@ public interface TrackService {
 
     TrackResponse.TrackDetailList getTrackFeeds(Member member, int page, int size);
 
+    TrackResponse.TrackId deleteTrack(Member member, Long trackId);
+
     TrackResponse.ReportId reportTrack(Member member, Long trackId);
 }
