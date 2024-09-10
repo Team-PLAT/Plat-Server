@@ -15,8 +15,6 @@ public interface MemberService {
 
     MemberResponse.MemberId updateStreamType(Member member, StreamType streamType);
 
-    MemberResponse.Avatar uploadAvatarImage(MultipartFile image);
-
     MemberResponse.MemberId updateAvatarUrl(Member member, String avatar);
 
     MemberResponse.MemberSignIn appleSocialSignIn(MemberRequest.MemberAppleSocialSignIn request, SocialType socialType);

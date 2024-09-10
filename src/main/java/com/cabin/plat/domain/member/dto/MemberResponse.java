@@ -38,13 +38,6 @@ public class MemberResponse {
 
     @Getter
     @Builder
-    public static class Avatar {
-        @Schema(description = "아바타 이미지 URL", example = "https://example.com/avatar.png")
-        private String avatar;
-    }
-
-    @Getter
-    @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MemberSignIn {

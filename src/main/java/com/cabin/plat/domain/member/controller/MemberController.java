@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
-@Tag(name = "멤버 API", description = "회원 관련 API입니다. 사용자 프로필 조회, 업데이트 및 삭제, 이미지 업로드 기능을 제공합니다.")
+@Tag(name = "멤버 API", description = "회원 관련 API입니다. 사용자 프로필 조회, 업데이트 및 삭제 기능을 제공합니다.")
 public class MemberController {
     private final MemberService memberService;
 
@@ -52,12 +52,6 @@ public class MemberController {
             @AuthMember Member member,
             @RequestParam StreamType streamType) {
         return BaseResponse.onSuccess(memberService.updateStreamType(member, streamType));
-    }
-
-    @Operation(summary = "유저 프로필 사진 업로드", description = "프로필 사진을 업로드하고 URL을 반환합니다. 이미지를 `image` 파라미터로 전송하여 프로필 사진을 변경하세요. \"유저 프로필 사진 변경\" API를 호출하기 직전에 사용해서 이미지의 URL을 받으세요.")
-    @PostMapping(value = "/profile/avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse<MemberResponse.Avatar> uploadAvatarImage(@RequestPart(value = "image") MultipartFile image) {
-        return BaseResponse.onSuccess(memberService.uploadAvatarImage(image));
     }
 
     @Operation(summary = "유저 프로필 사진 변경", description = "업로드한 이미지의 URL로 프로필 사진을 변경합니다. \"유저 프로필 사진 업로드\" API 에서 받은 이미지 URL을 `avatar` 객체에 담아 요청 본문으로 전달하세요.")
