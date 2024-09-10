@@ -4,12 +4,14 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Builder
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@SQLRestriction("deleted_at is null")
 public class Track extends BaseEntity {
 
     @Id
