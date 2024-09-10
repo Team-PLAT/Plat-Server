@@ -48,8 +48,6 @@ class TrackServiceTest {
     private List<Member> members;
     private List<Location> locations;
     private List<Track> tracks;
-    @Autowired
-    private DataSourceAutoConfiguration dataSourceAutoConfiguration;
 
     @BeforeEach
     void setUp() {
