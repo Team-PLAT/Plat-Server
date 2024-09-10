@@ -54,7 +54,7 @@ public class MemberController {
         return BaseResponse.onSuccess(memberService.updateStreamType(member, streamType));
     }
 
-    @Operation(summary = "유저 프로필 사진 변경", description = "업로드한 이미지의 URL로 프로필 사진을 변경합니다. \"유저 프로필 사진 업로드\" API 에서 받은 이미지 URL을 `avatar` 객체에 담아 요청 본문으로 전달하세요.")
+    @Operation(summary = "유저 프로필 사진 변경", description = "업로드한 이미지의 URL로 프로필 사진을 변경합니다. \"사진 업로드\" API 에서 받은 이미지 URL을 `avatar` 객체에 담아 요청 본문으로 전달하세요.")
     @PatchMapping("/profile/avatar")
     public BaseResponse<MemberResponse.MemberId> updateAvatarUrl(@AuthMember Member member,
                                                   @RequestBody MemberRequest.Avatar avatar) {
