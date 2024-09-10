@@ -16,11 +16,9 @@ import com.cabin.plat.domain.member.entity.RefreshToken;
 import com.cabin.plat.domain.member.entity.SocialType;
 import com.cabin.plat.domain.member.mapper.AuthenticationMapper;
 import com.cabin.plat.domain.member.repository.RefreshTokenRepository;
-import com.cabin.plat.global.util.S3FileComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -32,7 +30,6 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
-    private final S3FileComponent s3FileComponent;
     private final AuthenticationMapper authenticationMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
@@ -108,11 +105,6 @@ public class MemberServiceImpl implements MemberService {
         updateMember.setStreamType(streamType);
         memberRepository.save(updateMember);
         return memberMapper.toMemberId(updateMember.getId());
-    }
-
-    @Override
-    public Avatar uploadAvatarImage(MultipartFile image) {
-        return memberMapper.toAvatar(s3FileComponent.uploadFile("image", image));
     }
 
     @Override
