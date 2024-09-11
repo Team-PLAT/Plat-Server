@@ -83,6 +83,6 @@ public class PlaylistController {
             @PathVariable("playlistId") Long playlistId,
             @RequestBody PlaylistRequest.TrackId trackId) {
 
-        return BaseResponse.onSuccess(playlistService.addTrackToPlaylist(member, playlistId, trackId.getTrackId()));
+        return BaseResponse.onSuccess(playlistService.addTrackToPlaylist(member, playlistId, trackId));
     }
 }
