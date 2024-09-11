@@ -1,10 +1,8 @@
 package com.cabin.plat.domain.playlist.service;
 
 import com.cabin.plat.domain.member.entity.Member;
-import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload;
-import com.cabin.plat.domain.playlist.dto.PlaylistResponse.PlayListId;
-import com.cabin.plat.domain.playlist.dto.PlaylistResponse.PlaylistDetail;
-import com.cabin.plat.domain.playlist.dto.PlaylistResponse.Playlists;
+import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
+import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
 import com.cabin.plat.domain.playlist.mapper.PlaylistMapper;
 import com.cabin.plat.domain.playlist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,27 +15,37 @@ public class PlaylistServiceImpl implements PlaylistService {
     private final PlaylistMapper playlistMapper;
 
     @Override
-    public PlayListId addPlaylist(Member member, PlaylistUpload playlistUpload) {
+    public PlaylistResponse.PlayListId addPlaylist(Member member, PlaylistRequest.PlaylistUpload playlistUpload) {
         return null;
     }
 
     @Override
-    public Playlists getPlaylists(Member member, int page, int size) {
+    public PlaylistResponse.Playlists getPlaylists(Member member, int page, int size) {
         return null;
     }
 
     @Override
-    public Playlists getSearchedPlaylists(Member member, String title, int page, int size) {
+    public PlaylistResponse.Playlists getSearchedPlaylists(Member member, String title, int page, int size) {
         return null;
     }
 
     @Override
-    public PlaylistDetail getPlaylistDetail(Member member, Long playlistId) {
+    public PlaylistResponse.PlayListId deletePlaylist(Member member, Long playlistId) {
         return null;
     }
 
     @Override
-    public PlayListId deletePlaylist(Member member, Long playlistId) {
+    public PlaylistResponse.PlaylistDetail getPlaylistDetail(Member member, Long playlistId) {
+        return null;
+    }
+
+    @Override
+    public PlaylistResponse.PlayListId updatePlaylist(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload) {
+        return null;
+    }
+
+    @Override
+    public PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, Long trackId) {
         return null;
     }
 }
