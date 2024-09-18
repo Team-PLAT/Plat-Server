@@ -6,7 +6,7 @@ import lombok.*;
 public class PlaylistRequest {
 
     @Getter
-    @Setter
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PlaylistUpload {
@@ -15,10 +15,10 @@ public class PlaylistRequest {
         private List<TrackOrder> tracks;
 
         @Getter
-        @Setter
+        @Builder
         @NoArgsConstructor
         @AllArgsConstructor
-        private static class TrackOrder {
+        public static class TrackOrder {
             private Long trackId;
             private int orderIndex;
         }

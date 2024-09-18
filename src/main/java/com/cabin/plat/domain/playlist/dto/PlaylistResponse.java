@@ -27,7 +27,7 @@ public class PlaylistResponse {
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
-        private static class PlaylistInfo {
+        public static class PlaylistInfo {
             private Long playlistId;
             private String title;
             private String playlistImageUrl;
@@ -45,14 +45,14 @@ public class PlaylistResponse {
         private String title;
         private String playlistImageUrl;
         private LocalDateTime createdAt;
-        private List<TrackOrder> tracks;
+        private List<TrackDetailOrder> tracks;
     }
 
     @Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class TrackOrder {
+    public static class TrackDetailOrder {
         @Schema(description = "트랙 순서", example = "1")
         private int orderIndex;
 

@@ -2,9 +2,7 @@ package com.cabin.plat.domain.playlist.service;
 
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
-import com.cabin.plat.domain.playlist.dto.PlaylistRequest.TrackId;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
-import com.cabin.plat.domain.playlist.dto.PlaylistResponse.PlayListId;
 import com.cabin.plat.domain.playlist.mapper.PlaylistMapper;
 import com.cabin.plat.domain.playlist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
