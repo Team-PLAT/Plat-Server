@@ -14,7 +14,6 @@ import com.cabin.plat.domain.track.repository.LocationRepository;
 import com.cabin.plat.domain.track.repository.TrackReportRepository;
 import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.global.exception.RestApiException;
-import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,11 +93,11 @@ class TrackServiceTest {
     private List<Track> createTestTracks(List<Member> members, List<Location> locations) {
         List<Track> tracks = new ArrayList<>();
         Track track1 = new Track(null, members.get(0), locations.get(0), "isrc1", "기숙사에서 한곡", "https://testimage1.com");
-        Track track2 = new Track(null, members.get(1), locations.get(1), "isrc2", "버거킹마을 공연 최애 노래", "https://testimage2.com");
-        Track track3 = new Track(null, members.get(2), locations.get(2), "isrc3", "아카데미는 이 노래지", "https://testimage3.com");
-        Track track4 = new Track(null, members.get(0), locations.get(3), "isrc4", "리버스아카데미 노래", "https://testimage4.com");
-        Track track5 = new Track(null, members.get(1), locations.get(4), "isrc5", "영일대는 이노래지", "https://testimage5.com");
-        Track track6 = new Track(null, members.get(1), locations.get(5), "isrc5", "황리단길과 어울리는", "https://testimage5.com");
+        Track track2 = new Track(null, members.get(0), locations.get(1), "isrc2", "버거킹마을 공연 최애 노래", "https://testimage2.com");
+        Track track3 = new Track(null, members.get(1), locations.get(2), "isrc3", "아카데미는 이 노래지", "https://testimage3.com");
+        Track track4 = new Track(null, members.get(1), locations.get(3), "isrc4", "리버스아카데미 노래", "https://testimage4.com");
+        Track track5 = new Track(null, members.get(2), locations.get(4), "isrc5", "영일대는 이노래지", "https://testimage5.com");
+        Track track6 = new Track(null, members.get(2), locations.get(5), "isrc6", "황리단길과 어울리는", "https://testimage5.com");
 
         tracks.add(trackRepository.save(track1));
         tracks.add(trackRepository.save(track2));
@@ -127,7 +125,7 @@ class TrackServiceTest {
     }
 
     @Test
-    void 좌표_4개를_받아서_내부에_포함된_모든_트랙_반환() {
+    void getTracksByLocationTest() {
         // given
         TrackResponse.TrackMap expectedTrackMap1 = TrackResponse.TrackMap.builder()
                 .trackId(2L)
@@ -157,7 +155,7 @@ class TrackServiceTest {
     }
 
     @Test
-    void 트랙_아이디로_트랙_디테일_조회() {
+    void getTrackByIdTest() {
         // given
         Long trackId = tracks.get(0).getId();
         TrackResponse.MemberInfo memberInfo = TrackResponse.MemberInfo.builder()
@@ -184,7 +182,7 @@ class TrackServiceTest {
     }
 
     @Nested
-    class 트랙_좋아요_테스트 {
+    class likeTrackTest {
 
         private Long trackId;
         private Member member0;
@@ -248,7 +246,7 @@ class TrackServiceTest {
 
     // MARK: 해당 테스트는 외부 API (역지오코딩) 에 종속적입니다.
     @Test
-    void 트랙_게시() {
+    void addTrackTest() {
         // given
         Member member = members.get(0);
         TrackRequest.TrackUpload trackUpload = TrackRequest.TrackUpload.builder()
@@ -277,7 +275,7 @@ class TrackServiceTest {
     }
 
     @Test
-    void 트렉_피드_조회_개수만_확인() {
+    void getTrackFeedsTest_개수만() {
         // given
         Member member = members.get(0);
 
@@ -289,7 +287,7 @@ class TrackServiceTest {
     }
 
     @Test
-    void 트랙_피드_페이지네이션() {
+    void getTrackFeedsTest_페이지네이션() {
         // given
         Member member = members.get(0);
 
@@ -305,7 +303,7 @@ class TrackServiceTest {
     }
 
     @Nested
-    class 트랙_삭제_테스트 {
+    class deleteTrackTest {
         @Test
         void 트랙_삭제_성공() {
             // given
@@ -335,7 +333,7 @@ class TrackServiceTest {
     }
 
     @Test
-    void 트랙_신고() {
+    void reportTrackTest() {
         // given
         Long trackId = tracks.get(0).getId();
         Member member1 = members.get(1);
