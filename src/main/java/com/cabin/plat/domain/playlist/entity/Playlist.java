@@ -1,5 +1,6 @@
 package com.cabin.plat.domain.playlist.entity;
 
+import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.global.common.BaseEntity;
 import jakarta.persistence.*;
 import java.util.List;
@@ -17,6 +18,10 @@ public class Playlist extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "playlist_id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Column(nullable = false)
     private String title;
