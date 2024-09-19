@@ -314,21 +314,7 @@ class PlaylistServiceImplTest {
             PlaylistResponse.PlaylistDetail playlistDetail = playlistService.getPlaylistDetail(member, playlistId);
 
             // then
-            // 플레이리스트 정보 테스트
-            assertThat(playlistDetail.getTitle()).isEqualTo("플레이리스트 제목0");
-            assertThat(playlistDetail.getPlaylistImageUrl()).isEqualTo("https://test0.com");
-
-            PlaylistResponse.TrackDetailOrder trackDetailOrder0 = playlistDetail.getTracks().get(0);
-            PlaylistResponse.TrackDetailOrder trackDetailOrder1 = playlistDetail.getTracks().get(1);
-            PlaylistResponse.TrackDetailOrder trackDetailOrder2 = playlistDetail.getTracks().get(2);
-
-            // 플레이리스트 안의 트랙 정보 테스트
-            assertThat(trackDetailOrder0.getOrderIndex()).isEqualTo(0);
-            assertThat(trackDetailOrder1.getOrderIndex()).isEqualTo(1);
-            assertThat(trackDetailOrder2.getOrderIndex()).isEqualTo(2);
-            assertThat(trackDetailOrder0.getTrackDetail().getIsrc()).isEqualTo("isrc1");
-            assertThat(trackDetailOrder1.getTrackDetail().getIsrc()).isEqualTo("isrc2");
-            assertThat(trackDetailOrder2.getTrackDetail().getIsrc()).isEqualTo("isrc3");
+            assertPlaylistTrackDetails(playlistDetail);
         }
 
         @Test
@@ -342,15 +328,14 @@ class PlaylistServiceImplTest {
 
             // then
 
-            // 플레이리스트 정보 테스트
-            assertThat(playlistDetail.getTitle()).isEqualTo("플레이리스트 제목0");
-            assertThat(playlistDetail.getPlaylistImageUrl()).isEqualTo("https://test0.com");
+            assertPlaylistTrackDetails(playlistDetail);
+        }
 
+        private void assertPlaylistTrackDetails(PlaylistResponse.PlaylistDetail playlistDetail) {
             PlaylistResponse.TrackDetailOrder trackDetailOrder0 = playlistDetail.getTracks().get(0);
             PlaylistResponse.TrackDetailOrder trackDetailOrder1 = playlistDetail.getTracks().get(1);
             PlaylistResponse.TrackDetailOrder trackDetailOrder2 = playlistDetail.getTracks().get(2);
 
-            // 플레이리스트 안의 트랙 정보 테스트
             assertThat(trackDetailOrder0.getOrderIndex()).isEqualTo(0);
             assertThat(trackDetailOrder1.getOrderIndex()).isEqualTo(1);
             assertThat(trackDetailOrder2.getOrderIndex()).isEqualTo(2);
