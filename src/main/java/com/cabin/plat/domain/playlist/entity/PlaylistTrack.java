@@ -1,6 +1,7 @@
 package com.cabin.plat.domain.playlist.entity;
 
 import com.cabin.plat.domain.track.entity.Track;
+import com.cabin.plat.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
@@ -11,7 +12,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SQLRestriction("deleted_at is null")
-public class PlaylistTrack {
+public class PlaylistTrack extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "track_playlist_id")
