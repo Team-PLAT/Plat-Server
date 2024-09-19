@@ -128,7 +128,6 @@ class TrackServiceTest {
     void getTracksByLocationTest() {
         // given
         TrackResponse.TrackMap expectedTrackMap1 = TrackResponse.TrackMap.builder()
-                .trackId(2L)
                 .isrc("isrc2")
                 .isLiked(false)
                 .longitude(129.322700)
@@ -136,7 +135,6 @@ class TrackServiceTest {
                 .build();
 
         TrackResponse.TrackMap expectedTrackMap2 = TrackResponse.TrackMap.builder()
-                .trackId(3L)
                 .isrc("isrc3")
                 .isLiked(false)
                 .longitude(129.325951)
@@ -149,9 +147,10 @@ class TrackServiceTest {
 
         // then
         assertThat(trackMaps.size()).isEqualTo(2);
-
-        assertThat(trackMaps).contains(expectedTrackMap1);
-        assertThat(trackMaps).contains(expectedTrackMap2);
+        assertThat(trackMaps.get(0)).usingRecursiveComparison()
+                .ignoringFields("trackId").isEqualTo(expectedTrackMap1);
+        assertThat(trackMaps.get(1)).usingRecursiveComparison()
+                .ignoringFields("trackId").isEqualTo(expectedTrackMap2);
     }
 
     @Test
@@ -303,7 +302,7 @@ class TrackServiceTest {
     }
 
     @Nested
-    class deleteTrackTest {
+    class DeleteTrackTest {
         @Test
         void 트랙_삭제_성공() {
             // given

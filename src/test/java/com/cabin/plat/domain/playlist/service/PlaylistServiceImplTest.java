@@ -164,7 +164,7 @@ class PlaylistServiceImplTest {
     }
 
     @Nested
-    class addPlaylist {
+    class AddPlaylist {
 
         @Test
         void 플레이리스트_생성_테스트() {
