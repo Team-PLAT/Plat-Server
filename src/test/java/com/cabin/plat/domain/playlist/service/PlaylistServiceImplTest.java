@@ -167,7 +167,7 @@ class PlaylistServiceImplTest {
     class AddPlaylist {
 
         @Test
-        void 플레이리스트_생성_테스트() {
+        void 플레이리스트_테이블_생성_테스트() {
             // given
             Long playlistId = playlistIds.get(0);
 
@@ -175,41 +175,41 @@ class PlaylistServiceImplTest {
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId); // 저장된 플레이리스트 확인
 
             // then
-            assertThat(playlistId).isNotNull();
             assertThat(optionalPlaylist.isPresent()).isTrue();
             Playlist playlist = optionalPlaylist.get();
 
             assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목0");
             assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test0.com");
-            assertThat(playlist.getPlaylistTracks().get(0).getId()).isEqualTo(tracks.get(0).getId());
-            assertThat(playlist.getPlaylistTracks().get(0).getOrderIndex()).isEqualTo(0);
-            assertThat(playlist.getPlaylistTracks().get(1).getId()).isEqualTo(tracks.get(1).getId());
-            assertThat(playlist.getPlaylistTracks().get(1).getOrderIndex()).isEqualTo(1);
+            assertThat(playlist.getMember().getNickname()).isEqualTo("닉네임1");
         }
 
         @Test
         void 플레이리스트_트랙_관계_테이블_생성_테스트() {
-            // given
-            Optional<PlaylistTrack> optionalPlaylistTrack1 = playlistTrackRepository.findById(1L);
-            Optional<PlaylistTrack> optionalPlaylistTrack2 = playlistTrackRepository.findById(2L);
-
-            // when
-            assertThat(optionalPlaylistTrack1.isPresent()).isTrue();
-            assertThat(optionalPlaylistTrack2.isPresent()).isTrue();
-            PlaylistTrack playlistTrack1 = optionalPlaylistTrack1.get();
-            PlaylistTrack playlistTrack2 = optionalPlaylistTrack2.get();
+            // given when
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAll();
+            List<PlaylistTrack> filteredPlaylistTracks0 = playlistTracks.stream()
+                    .filter(p -> p.getPlaylist().getTitle().equals("플레이리스트 제목0"))
+                    .toList();
+            List<PlaylistTrack> filteredPlaylistTracks1 = playlistTracks.stream()
+                    .filter(p -> p.getPlaylist().getTitle().equals("플레이리스트 제목1"))
+                    .toList();
 
             // then
-            assertThat(playlistTrack1.getPlaylist().getTitle()).isEqualTo("플레이리스트 제목0");
-            assertThat(playlistTrack2.getPlaylist().getTitle()).isEqualTo("플레이리스트 제목0");
-            assertThat(playlistTrack1.getPlaylist().getPlaylistImageUrl()).isEqualTo("https://test0.com");
-            assertThat(playlistTrack2.getPlaylist().getPlaylistImageUrl()).isEqualTo("https://test0.com");
-            assertThat(playlistTrack1.getTrack().getIsrc()).isEqualTo("isrc1");
-            assertThat(playlistTrack2.getTrack().getIsrc()).isEqualTo("isrc2");
-            assertThat(playlistTrack1.getOrderIndex()).isEqualTo(0);
-            assertThat(playlistTrack2.getOrderIndex()).isEqualTo(1);
-            assertThat(playlistTrack1.getPlaylist().getId()).isEqualTo(playlistIds.get(0));
-            assertThat(playlistTrack2.getPlaylist().getId()).isEqualTo(playlistIds.get(1));
+            assertThat(filteredPlaylistTracks0).hasSize(3);
+            assertThat(filteredPlaylistTracks0).allSatisfy(pt -> {
+                assertThat(pt.getPlaylist().getTitle()).isEqualTo("플레이리스트 제목0");
+                assertThat(pt.getPlaylist().getPlaylistImageUrl()).isEqualTo("https://test0.com");
+                assertThat(pt.getTrack().getIsrc()).isIn("isrc1", "isrc2", "isrc3");
+                assertThat(pt.getOrderIndex()).isIn(0, 1, 2);
+            });
+
+            assertThat(filteredPlaylistTracks1).hasSize(3);
+            assertThat(filteredPlaylistTracks1).allSatisfy(pt -> {
+                assertThat(pt.getPlaylist().getTitle()).isEqualTo("플레이리스트 제목1");
+                assertThat(pt.getPlaylist().getPlaylistImageUrl()).isEqualTo("https://test1.com");
+                assertThat(pt.getTrack().getIsrc()).isIn("isrc4", "isrc5", "isrc6");
+                assertThat(pt.getOrderIndex()).isIn(0, 1, 2);
+            });
         }
     }
 
