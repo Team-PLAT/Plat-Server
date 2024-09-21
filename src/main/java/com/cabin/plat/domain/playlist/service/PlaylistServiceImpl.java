@@ -109,6 +109,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         return playlistMapper.toPlaylistDetail(playlist, trackDetailOrders);
     }
 
+    @Transactional
     @Override
     public PlaylistResponse.PlayListId updatePlaylist(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload) {
         Playlist playlist = findPlaylistById(playlistId);
@@ -119,8 +120,10 @@ public class PlaylistServiceImpl implements PlaylistService {
         return playlistMapper.toPlaylistId(playlistId);
     }
 
+    @Transactional
     @Override
     public PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, PlaylistRequest.TrackId trackId) {
+        // TODO: 트랙 이미 추가된건지 중복 검사
         Playlist playlist = findPlaylistById(playlistId);
         Track track = findTrackById(trackId.getTrackId());
         if (!playlist.getMember().equals(member)) {
