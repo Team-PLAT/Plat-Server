@@ -63,6 +63,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         // TODO: 효율 개선
         List<Playlist> playlists = playlistRepository.findAllByMember(member, pageable).getContent();
         List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
+            // TODO: playlist.getPlaylistTracks 를 가져오기
             List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
             return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
         }).toList();
@@ -77,6 +78,7 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         List<Playlist> playlists = playlistRepository.findAllByMemberAndTitleContaining(member, title, pageable).getContent();
         List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
+            // TODO: playlist.getPlaylistTracks 를 가져오기
             List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
             return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
         }).toList();
@@ -96,6 +98,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Override
     public PlaylistResponse.PlaylistDetail getPlaylistDetail(Member member, Long playlistId) {
         Playlist playlist = findPlaylistById(playlistId);
+        // TODO: playlist.getPlaylistTracks 를 가져오기
         List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
         List<PlaylistResponse.TrackDetailOrder> trackDetailOrders = playlistTracks.stream()
                 .map(playlistTrack -> {
@@ -108,12 +111,32 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public PlaylistResponse.PlayListId updatePlaylist(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload) {
-        return null;
+        Playlist playlist = findPlaylistById(playlistId);
+        if (!playlist.getMember().equals(member)) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
+        }
+        // TODO: 플레이리스트 업데이트
+        return playlistMapper.toPlaylistId(playlistId);
     }
 
     @Override
     public PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, PlaylistRequest.TrackId trackId) {
-        return null;
+        Playlist playlist = findPlaylistById(playlistId);
+        Track track = findTrackById(trackId.getTrackId());
+        if (!playlist.getMember().equals(member)) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
+        }
+
+        // TODO: playlist.getPlaylistTracks 를 가져와서 orderIndex 계산
+        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+        int nextOrderIndex = playlistTracks.isEmpty() ? 0 : playlistTracks.stream()
+                .mapToInt(PlaylistTrack::getOrderIndex)
+                .max()
+                .orElse(0) + 1;
+
+        PlaylistTrack playlistTrack = playlistMapper.toPlaylistTrack(playlist, track, nextOrderIndex);
+        playlistTrackRepository.save(playlistTrack);
+        return playlistMapper.toPlaylistId(playlistId);
     }
 
     private Track findTrackById(Long trackId) {
