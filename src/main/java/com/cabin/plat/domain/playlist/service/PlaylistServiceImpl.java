@@ -69,7 +69,16 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public PlaylistResponse.Playlists getSearchedPlaylists(Member member, String title, int page, int size) {
-        return null;
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sorts));
+
+        List<Playlist> playlists = playlistRepository.findAllByMemberAndTitleContaining(member, title, pageable).getContent();
+        List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+            return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
+        }).toList();
+        return playlistMapper.toPlaylists(playlistInfos);
     }
 
     @Override

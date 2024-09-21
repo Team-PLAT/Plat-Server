@@ -215,7 +215,7 @@ class PlaylistServiceImplTest {
     }
 
     @Nested
-    class getPlaylistsTests {
+    class GetPlaylistsTests {
         // MARK: 본인이 업로드한 플레이리스트만 가져온다.
 
         @Test
@@ -254,24 +254,27 @@ class PlaylistServiceImplTest {
         }
     }
 
-
     @Test
     void getSearchedPlaylistsTest() {
         // given
         Member member = members.get(0);
+        PlaylistResponse.Playlists.PlaylistInfo expectedPlaylistInfo = PlaylistResponse.Playlists.PlaylistInfo.builder()
+                .playlistId(playlistIds.get(0))
+                .title("플레이리스트 제목0")
+                .playlistImageUrl("https://test0.com")
+                .uploaderNicknames(Set.of(members.get(0).getNickname(), members.get(1).getNickname()))
+                .build();
 
         // when
         PlaylistResponse.Playlists playlists = playlistService.getSearchedPlaylists(member, "제목0", 0, 20);
         PlaylistResponse.Playlists.PlaylistInfo playlistInfo0 = playlists.getPlaylists().get(0);
 
         // then
-        assertThat(playlists.getPlaylists().size()).isEqualTo(1);
-
-        assertThat(playlistInfo0.getPlaylistId()).isEqualTo(playlistIds.get(0));
-        assertThat(playlistInfo0.getTitle()).isEqualTo("플레이리스트 제목0");
-        assertThat(playlistInfo0.getPlaylistImageUrl()).isEqualTo("https://test0.com");
-        assertThat(playlistInfo0.getUploaderNicknames()).usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(List.of(members.get(0).getNickname(), members.get(1).getNickname()));
+        assertThat(playlists.getPlaylists()).hasSize(1);
+        assertThat(playlistInfo0)
+                .usingRecursiveComparison()
+                .ignoringFields("createdAt")
+                .isEqualTo(expectedPlaylistInfo);
     }
 
     @Nested
