@@ -3,6 +3,7 @@ package com.cabin.plat.domain.member.entity;
 import com.cabin.plat.global.common.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -52,4 +53,17 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SocialType socialType;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Member)) return false;
+        Member member = (Member) o;
+        return id.equals(member.id) && clientId.equals(member.clientId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, clientId);
+    }
 }
