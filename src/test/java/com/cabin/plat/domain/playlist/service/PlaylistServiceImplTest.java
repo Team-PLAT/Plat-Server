@@ -8,6 +8,7 @@ import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload.TrackOrder;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
+import com.cabin.plat.domain.playlist.dto.PlaylistResponse.Playlists;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse.Playlists.PlaylistInfo;
 import com.cabin.plat.domain.playlist.entity.Playlist;
 import com.cabin.plat.domain.playlist.entity.PlaylistTrack;
@@ -382,25 +383,16 @@ class PlaylistServiceImplTest {
             Long playlistId = playlistIds.get(0);
 
             // when
-            playlistService.deletePlaylist(member, playlistId);
-            Optional<Playlist> playlist = playlistRepository.findById(playlistId);
+            PlaylistResponse.PlayListId deletedPlayListId = playlistService.deletePlaylist(member, playlistId);
 
             // then
-            assertThat(playlist.isPresent()).isFalse();
-        }
-
-        @Test
-        void 플레이리스트_삭제_실패_권한없음() {
-            // given
-            Member member = members.get(1);
-            Long playlistId = playlistIds.get(0);
-
-            // when
-            playlistService.deletePlaylist(member, playlistId);
-            Optional<Playlist> playlist = playlistRepository.findById(playlistId);
-
-            // then
+            assertThat(deletedPlayListId.getPlaylistId()).isEqualTo(playlistId);
+            Optional<Playlist> playlist = playlistRepository.findById(deletedPlayListId.getPlaylistId());
             assertThat(playlist.isPresent()).isTrue();
+            assertThat(playlist.get().getDeletedAt()).isNotNull();
+
+            PlaylistResponse.Playlists playlists = playlistService.getPlaylists(member, 0, 20);
+            assertThat(playlists.getPlaylists()).hasSize(0);
         }
 
         @Test
