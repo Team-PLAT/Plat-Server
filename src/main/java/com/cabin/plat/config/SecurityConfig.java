@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/members/**").authenticated()
                         .requestMatchers("/tracks/**").authenticated()
                         .requestMatchers("/address/**").authenticated()
+                        .requestMatchers("/playlists/**").authenticated()
                         .requestMatchers("images/**").authenticated()
                         .anyRequest().denyAll());
 
