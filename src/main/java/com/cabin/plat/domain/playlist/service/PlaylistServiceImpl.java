@@ -9,6 +9,7 @@ import com.cabin.plat.domain.playlist.entity.PlaylistTrack;
 import com.cabin.plat.domain.playlist.mapper.PlaylistMapper;
 import com.cabin.plat.domain.playlist.repository.PlaylistRepository;
 import com.cabin.plat.domain.playlist.repository.PlaylistTrackRepository;
+import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.domain.track.service.TrackService;
@@ -94,7 +95,15 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public PlaylistResponse.PlaylistDetail getPlaylistDetail(Member member, Long playlistId) {
-        return null;
+        Playlist playlist = findPlaylistById(playlistId);
+        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+        List<PlaylistResponse.TrackDetailOrder> trackDetailOrders = playlistTracks.stream()
+                .map(playlistTrack -> {
+                    TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member,
+                            playlistTrack.getTrack().getId());
+                    return playlistMapper.toTrackDetailOrder(playlistTrack, trackDetail);
+                }).toList();
+        return playlistMapper.toPlaylistDetail(playlist, trackDetailOrders);
     }
 
     @Override
