@@ -128,9 +128,7 @@ public class TrackServiceImpl implements TrackService {
     @Transactional
     public TrackId deleteTrack(Member member, Long trackId) {
         Track track = findTrackById(trackId);
-        Long trackUploaderId = track.getMember().getId();
-        Long memberId = member.getId();
-        if (!trackUploaderId.equals(memberId)) {
+        if (!track.getMember().equals(member)) {
             throw new RestApiException(TrackErrorCode.TRACK_DELETE_FORBIDDEN);
         }
         track.delete();
