@@ -13,6 +13,7 @@ import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.exception.RestApiException;
+import com.cabin.plat.global.exception.errorCode.PlaylistErrorCode;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -83,7 +84,12 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public PlaylistResponse.PlayListId deletePlaylist(Member member, Long playlistId) {
-        return null;
+        Playlist playlist = findPlaylistById(playlistId);
+        if (!playlist.getMember().equals(member)) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_DELETE_FORBIDDEN);
+        }
+        playlist.delete();
+        return playlistMapper.toPlaylistId(playlistId);
     }
 
     @Override
@@ -104,5 +110,10 @@ public class PlaylistServiceImpl implements PlaylistService {
     private Track findTrackById(Long trackId) {
         return trackRepository.findById(trackId)
                 .orElseThrow(() -> new RestApiException(TrackErrorCode.TRACK_NOT_FOUND));
+    }
+
+    private Playlist findPlaylistById(Long playlistId) {
+        return playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RestApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
     }
 }
