@@ -153,13 +153,45 @@ class PlaylistServiceImplTest {
                 ))
                 .build();
 
-        return List.of(playlistUpload0, playlistUpload1);
+        PlaylistRequest.PlaylistUpload playlistUpload2 = PlaylistUpload.builder()
+                .title("플레이리스트 제목3")
+                .playlistImageUrl("https://test3.com")
+                .tracks(List.of(
+                        TrackOrder.builder()
+                                .trackId(tracks.get(0).getId())
+                                .orderIndex(0)
+                                .build()
+                        ,TrackOrder.builder()
+                                .trackId(tracks.get(1).getId())
+                                .orderIndex(1)
+                                .build()
+                        ,TrackOrder.builder()
+                                .trackId(tracks.get(2).getId())
+                                .orderIndex(2)
+                                .build()
+                        ,TrackOrder.builder()
+                                .trackId(tracks.get(3).getId())
+                                .orderIndex(3)
+                                .build()
+                        ,TrackOrder.builder()
+                                .trackId(tracks.get(4).getId())
+                                .orderIndex(4)
+                                .build()
+                        ,TrackOrder.builder()
+                                .trackId(tracks.get(5).getId())
+                                .orderIndex(5)
+                                .build()
+                ))
+                .build();
+
+        return List.of(playlistUpload0, playlistUpload1, playlistUpload2);
     }
 
     private List<Long> createTestPlaylists(List<Member> members, List<PlaylistUpload> playlistUploads) {
         Long playlistId0 = playlistService.addPlaylist(members.get(0), playlistUploads.get(0)).getPlaylistId();
         Long playlistId1 = playlistService.addPlaylist(members.get(1), playlistUploads.get(1)).getPlaylistId();
-        return List.of(playlistId0, playlistId1);
+        Long playlistId2 = playlistService.addPlaylist(members.get(1), playlistUploads.get(2)).getPlaylistId();
+        return List.of(playlistId0, playlistId1, playlistId2);
     }
 
     @Nested
@@ -221,24 +253,43 @@ class PlaylistServiceImplTest {
         @Test
         void 플레이리스트_목록_가져오기_성공() {
             // given
-            Member member = members.get(1);
-            PlaylistInfo expectedPlaylistInfo = PlaylistInfo.builder()
-                    .playlistId(playlistIds.get(1))
-                    .title("플레이리스트 제목1")
-                    .playlistImageUrl("https://test1.com")
-                    .uploaderNicknames(Set.of(members.get(1).getNickname(), members.get(2).getNickname()))
+            Member member0 = members.get(0);
+            Member member1 = members.get(1);
+            PlaylistInfo expectedPlaylistInfo1 = PlaylistInfo.builder()
+                    .playlistId(playlistIds.get(0))
+                    .title("플레이리스트 제목0")
+                    .playlistImageUrl("https://test0.com")
+                    .uploaderNicknames(Set.of(members.get(0).getNickname(), members.get(1).getNickname()))
                     .build();
 
             // when
-            PlaylistResponse.Playlists playlists = playlistService.getPlaylists(member, 0, 20);
-            PlaylistResponse.Playlists.PlaylistInfo playlistInfo = playlists.getPlaylists().get(0);
+            PlaylistResponse.Playlists playlists0 = playlistService.getPlaylists(member0, 0, 20);
+            PlaylistResponse.Playlists playlists1 = playlistService.getPlaylists(member1, 0, 20);
+            PlaylistResponse.Playlists.PlaylistInfo playlistInfo0 = playlists0.getPlaylists().get(0);
 
             // then
-            assertThat(playlists.getPlaylists()).hasSize(1);
-            assertThat(playlistInfo)
+            assertThat(playlists0.getPlaylists()).hasSize(1);
+            assertThat(playlists1.getPlaylists()).hasSize(2);
+            assertThat(playlistInfo0)
                     .usingRecursiveComparison()
                     .ignoringFields("createdAt")
-                    .isEqualTo(expectedPlaylistInfo);
+                    .isEqualTo(expectedPlaylistInfo1);
+        }
+
+        @Test
+        void 플레이리스트_목록_가져오기_페이지네이션() {
+            // given
+            Member member1 = members.get(1);
+
+            // when
+            PlaylistResponse.Playlists pagedPlaylists0 = playlistService.getPlaylists(member1, 0, 1);
+            PlaylistResponse.Playlists pagedPlaylists1 = playlistService.getPlaylists(member1, 1, 1);
+            PlaylistResponse.Playlists pagedPlaylists2 = playlistService.getPlaylists(member1, 2, 1);
+
+            // then
+            assertThat(pagedPlaylists0.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists1.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists2.getPlaylists()).hasSize(0);
         }
 
         @Test
@@ -254,27 +305,71 @@ class PlaylistServiceImplTest {
         }
     }
 
-    @Test
-    void getSearchedPlaylistsTest() {
-        // given
-        Member member = members.get(0);
-        PlaylistResponse.Playlists.PlaylistInfo expectedPlaylistInfo = PlaylistResponse.Playlists.PlaylistInfo.builder()
-                .playlistId(playlistIds.get(0))
-                .title("플레이리스트 제목0")
-                .playlistImageUrl("https://test0.com")
-                .uploaderNicknames(Set.of(members.get(0).getNickname(), members.get(1).getNickname()))
-                .build();
+    @Nested
+    class GetSearchedPlaylistsTest {
 
-        // when
-        PlaylistResponse.Playlists playlists = playlistService.getSearchedPlaylists(member, "제목0", 0, 20);
-        PlaylistResponse.Playlists.PlaylistInfo playlistInfo0 = playlists.getPlaylists().get(0);
+        @Test
+        void 플레이리스트_제목_검색_2개_중에_하나만_검색_성공() {
+            // given
+            Member member = members.get(1);
+            PlaylistResponse.Playlists.PlaylistInfo expectedPlaylistInfo = PlaylistResponse.Playlists.PlaylistInfo.builder()
+                    .playlistId(playlistIds.get(1))
+                    .title("플레이리스트 제목1")
+                    .playlistImageUrl("https://test1.com")
+                    .uploaderNicknames(Set.of(members.get(1).getNickname(), members.get(2).getNickname()))
+                    .build();
 
-        // then
-        assertThat(playlists.getPlaylists()).hasSize(1);
-        assertThat(playlistInfo0)
-                .usingRecursiveComparison()
-                .ignoringFields("createdAt")
-                .isEqualTo(expectedPlaylistInfo);
+            // when
+            PlaylistResponse.Playlists playlists = playlistService.getSearchedPlaylists(member, "제목1", 0, 20);
+            PlaylistResponse.Playlists.PlaylistInfo playlistInfo0 = playlists.getPlaylists().get(0);
+
+            // then
+            assertThat(playlists.getPlaylists()).hasSize(1);
+            assertThat(playlistInfo0)
+                    .usingRecursiveComparison()
+                    .ignoringFields("createdAt")
+                    .isEqualTo(expectedPlaylistInfo);
+        }
+
+        @Test
+        void 플레이리스트_제목_검색_페이징() {
+            // given
+            Member member = members.get(1);
+
+            // when
+            PlaylistResponse.Playlists pagedPlaylists0 = playlistService.getSearchedPlaylists(member, "플레이리스트", 0, 1);
+            PlaylistResponse.Playlists pagedPlaylists1 = playlistService.getSearchedPlaylists(member, "플레이리스트", 1, 1);
+            PlaylistResponse.Playlists pagedPlaylists2 = playlistService.getSearchedPlaylists(member, "플레이리스트", 2, 1);
+
+            // then
+            assertThat(pagedPlaylists0.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists1.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists2.getPlaylists()).hasSize(0);
+        }
+
+        @Test
+        void 플레이리스트_제목_검색_일치하는_플레이리스트_없음() {
+            // given
+            Member member = members.get(1);
+
+            // when
+            PlaylistResponse.Playlists playlists = playlistService.getSearchedPlaylists(member, "플레이리스트 제목 아님", 0, 20);
+
+            // then
+            assertThat(playlists.getPlaylists()).isEmpty();
+        }
+
+        @Test
+        void 플레이리스트_제목_검색_남의_플레이리스트_검색_안됨() {
+            // given
+            Member member = members.get(0);
+
+            // when
+            PlaylistResponse.Playlists playlists = playlistService.getSearchedPlaylists(member, "플레이리스트 제목1", 0, 20);
+
+            // then
+            assertThat(playlists.getPlaylists()).isEmpty();
+        }
     }
 
     @Nested
