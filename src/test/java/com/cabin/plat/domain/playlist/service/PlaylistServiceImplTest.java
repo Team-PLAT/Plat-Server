@@ -208,7 +208,7 @@ class PlaylistServiceImplTest {
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId); // 저장된 플레이리스트 확인
 
             // then
-            assertThat(playlists).hasSize(2);
+            assertThat(playlists).hasSize(3);
             assertThat(optionalPlaylist.isPresent()).isTrue();
             Playlist playlist = optionalPlaylist.get();
 
