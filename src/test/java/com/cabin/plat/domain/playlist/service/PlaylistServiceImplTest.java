@@ -8,6 +8,7 @@ import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload.TrackOrder;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
+import com.cabin.plat.domain.playlist.dto.PlaylistResponse.Playlists.PlaylistInfo;
 import com.cabin.plat.domain.playlist.entity.Playlist;
 import com.cabin.plat.domain.playlist.entity.PlaylistTrack;
 import com.cabin.plat.domain.playlist.repository.PlaylistRepository;
@@ -17,9 +18,7 @@ import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.repository.LocationRepository;
 import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.global.exception.RestApiException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -172,9 +171,11 @@ class PlaylistServiceImplTest {
             Long playlistId = playlistIds.get(0);
 
             // when
+            List<Playlist> playlists = playlistRepository.findAll();
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId); // 저장된 플레이리스트 확인
 
             // then
+            assertThat(playlists).hasSize(2);
             assertThat(optionalPlaylist.isPresent()).isTrue();
             Playlist playlist = optionalPlaylist.get();
 
@@ -213,31 +214,46 @@ class PlaylistServiceImplTest {
         }
     }
 
-    @Test
-    void getPlaylistsTest() {
-        // given
-        Member member = members.get(0);
+    @Nested
+    class getPlaylistsTests {
+        // MARK: 본인이 업로드한 플레이리스트만 가져온다.
 
-        // when
-        PlaylistResponse.Playlists playlists = playlistService.getPlaylists(member, 0, 20);
-        PlaylistResponse.Playlists.PlaylistInfo playlistInfo0 = playlists.getPlaylists().get(0);
-        PlaylistResponse.Playlists.PlaylistInfo playlistInfo1 = playlists.getPlaylists().get(1);
+        @Test
+        void 플레이리스트_목록_가져오기_성공() {
+            // given
+            Member member = members.get(1);
+            PlaylistInfo expectedPlaylistInfo = PlaylistInfo.builder()
+                    .playlistId(playlistIds.get(1))
+                    .title("플레이리스트 제목1")
+                    .playlistImageUrl("https://test1.com")
+                    .uploaderNicknames(Set.of(members.get(1).getNickname(), members.get(2).getNickname()))
+                    .build();
 
-        // then
-        assertThat(playlists.getPlaylists().size()).isEqualTo(2);
+            // when
+            PlaylistResponse.Playlists playlists = playlistService.getPlaylists(member, 0, 20);
+            PlaylistResponse.Playlists.PlaylistInfo playlistInfo = playlists.getPlaylists().get(0);
 
-        assertThat(playlistInfo0.getPlaylistId()).isEqualTo(playlistIds.get(0));
-        assertThat(playlistInfo0.getTitle()).isEqualTo("플레이리스트 제목0");
-        assertThat(playlistInfo0.getPlaylistImageUrl()).isEqualTo("https://test0.com");
-        assertThat(playlistInfo0.getUploaderNicknames()).usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(List.of(members.get(0).getNickname(), members.get(1).getNickname()));
+            // then
+            assertThat(playlists.getPlaylists()).hasSize(1);
+            assertThat(playlistInfo)
+                    .usingRecursiveComparison()
+                    .ignoringFields("createdAt")
+                    .isEqualTo(expectedPlaylistInfo);
+        }
 
-        assertThat(playlistInfo1.getPlaylistId()).isEqualTo(playlistIds.get(1));
-        assertThat(playlistInfo1.getTitle()).isEqualTo("플레이리스트 제목1");
-        assertThat(playlistInfo1.getPlaylistImageUrl()).isEqualTo("https://test1.com");
-        assertThat(playlistInfo1.getUploaderNicknames()).usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(List.of(members.get(1).getNickname(), members.get(2).getNickname()));
+        @Test
+        void 플레이리스트_목록_가져오기_없음() {
+            // given
+            Member member = members.get(2);
+
+            // when
+            PlaylistResponse.Playlists playlists = playlistService.getPlaylists(member, 0, 20);
+
+            // then
+            assertThat(playlists.getPlaylists()).isEmpty();
+        }
     }
+
 
     @Test
     void getSearchedPlaylistsTest() {

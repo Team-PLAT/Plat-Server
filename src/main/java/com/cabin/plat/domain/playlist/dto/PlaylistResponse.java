@@ -4,6 +4,7 @@ import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import lombok.*;
 
 public class PlaylistResponse {
@@ -32,7 +33,7 @@ public class PlaylistResponse {
             private String title;
             private String playlistImageUrl;
             private LocalDateTime createdAt;
-            private List<String> uploaderNicknames;
+            private Set<String> uploaderNicknames;
         }
     }
 

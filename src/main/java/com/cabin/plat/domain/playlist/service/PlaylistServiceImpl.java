@@ -14,8 +14,11 @@ import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
-import java.util.List;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +54,17 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public PlaylistResponse.Playlists getPlaylists(Member member, int page, int size) {
-        return null;
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sorts));
+
+        // TODO: 효율 개선
+        List<Playlist> playlists = playlistRepository.findAllByMember(member, pageable).getContent();
+        List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+            return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
+        }).toList();
+        return playlistMapper.toPlaylists(playlistInfos);
     }
 
     @Override
