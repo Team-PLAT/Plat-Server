@@ -29,7 +29,7 @@ public class PlaylistController {
     }
 
     @Operation(summary = "플레이리스트 목록 조회", description = "사용자의 모든 플레이리스트를 가져온다. 페이지네이션을 지원합니다. page 파라미터에 페이지 번호를 입력해주세요.")
-    @GetMapping()
+    @GetMapping
     public BaseResponse<PlaylistResponse.Playlists> getPlaylists(
             @AuthMember Member member,
             @RequestParam(defaultValue = "0") int page,
