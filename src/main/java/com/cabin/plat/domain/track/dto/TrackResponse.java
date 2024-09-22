@@ -73,7 +73,7 @@ import lombok.*;
         @Schema(description = "주소", example = "경상북도 포항시 남구 지곡동")
         private String address;
 
-        @Schema(description = "트랙 이미지 URL", example = "https://example.com/track.png")
+        @Schema(description = "트랙 이미지 URL", example = "https://s3.amazonaws.com/mybucket/images/sample.jpg")
         private String imageUrl;
 
         @Schema(description = "트랙 내용", example = "트랙 게시물 본문입니다.")

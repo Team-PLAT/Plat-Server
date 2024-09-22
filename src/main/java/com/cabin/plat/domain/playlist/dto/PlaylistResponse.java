@@ -13,7 +13,7 @@ public class PlaylistResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PlayListId {
-        @Schema(description = "플레이리스트 ID")
+        @Schema(description = "플레이리스트 고유 ID", example = "1")
         private Long playlistId;
     }
 
@@ -29,10 +29,18 @@ public class PlaylistResponse {
         @AllArgsConstructor
         @NoArgsConstructor
         public static class PlaylistInfo {
+            @Schema(description = "플레이리스트 고유 ID", example = "1")
             private Long playlistId;
+
+            @Schema(description = "플레이리스트 제목", example = "플레이리스트 제목")
             private String title;
+
+            @Schema(description = "플레이리스트 이미지 URL", example = "https://s3.amazonaws.com/mybucket/images/sample.jpg")
             private String playlistImageUrl;
+
+            @Schema(description = "플레이리스트 생성일", example = "2024-09-22T07:23:09.102Z")
             private LocalDateTime createdAt;
+
             private Set<String> uploaderNicknames;
         }
     }
@@ -42,10 +50,18 @@ public class PlaylistResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PlaylistDetail {
+        @Schema(description = "플레이리스트 고유 ID", example = "1")
         private Long playlistId;
+
+        @Schema(description = "플레이리스트 제목", example = "플레이리스트 제목")
         private String title;
+
+        @Schema(description = "플레이리스트 이미지 URL", example = "https://s3.amazonaws.com/mybucket/images/sample.jpg")
         private String playlistImageUrl;
+
+        @Schema(description = "플레이리스트 생성일", example = "2024-09-22T07:23:09.102Z")
         private LocalDateTime createdAt;
+
         private List<TrackDetailOrder> tracks;
     }
 
