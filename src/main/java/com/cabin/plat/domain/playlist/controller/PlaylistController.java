@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/playlists")
 @Tag(name = "플레이리스트 API", description = "플레이리스트 관련 API 입니다.")
 public class PlaylistController {
+
     private final PlaylistService playlistService;
 
     @Operation(summary = "플레이리스트 생성", description = "플레이리스트를 생성한다.")
@@ -53,6 +54,7 @@ public class PlaylistController {
     public BaseResponse<PlaylistResponse.PlayListId> deletePlaylist(
             @AuthMember Member member,
             @PathVariable("playlistId") Long playlistId) {
+
         return BaseResponse.onSuccess(playlistService.deletePlaylist(member, playlistId));
     }
 
@@ -104,5 +106,4 @@ public class PlaylistController {
 
         return BaseResponse.onSuccess(playlistService.deleteTrackFromPlaylist(member, playlistId, trackId));
     }
-
 }
