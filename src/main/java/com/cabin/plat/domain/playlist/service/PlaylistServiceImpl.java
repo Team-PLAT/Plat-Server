@@ -4,6 +4,7 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistOrders;
+import com.cabin.plat.domain.playlist.dto.PlaylistRequest.TrackId;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.TrackOrder;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse.PlayListId;
@@ -131,15 +132,12 @@ public class PlaylistServiceImpl implements PlaylistService {
         // TODO: playlist.getPlaylistTracks 로 가져오기 (현재는 playlistTrackRepository.findAllByPlaylistIs(playlist) 로 대체)
         List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
 
-        if (playlistTracks.stream().anyMatch(playlistTrack -> playlistTrack.getTrack().getId().equals(trackId.getTrackId()))) {
-            throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_DUPLICATE);
-        }
+        validateTrackDuplicateInPlaylist(trackId, playlistTracks);
 
         int nextOrderIndex = playlistTracks.isEmpty() ? 0 : playlistTracks.stream()
                 .mapToInt(PlaylistTrack::getOrderIndex)
                 .max()
                 .orElse(0) + 1;
-
 
         PlaylistTrack playlistTrack = playlistMapper.toPlaylistTrack(playlist, track, nextOrderIndex);
         playlistTrackRepository.save(playlistTrack);
@@ -187,11 +185,10 @@ public class PlaylistServiceImpl implements PlaylistService {
         return playlistMapper.toPlaylistId(playlistId);
     }
 
-    private PlaylistTrack findPlaylistTrackByTrack(List<PlaylistTrack> playlistTracks, Track track) {
-        return playlistTracks.stream()
-                .filter(pt -> pt.getTrack().getId().equals(track.getId()))
-                .findFirst()
-                .orElseThrow(() -> new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_NOT_FOUND));
+    private static void validateTrackDuplicateInPlaylist(TrackId trackId, List<PlaylistTrack> playlistTracks) {
+        if (playlistTracks.stream().anyMatch(playlistTrack -> playlistTrack.getTrack().getId().equals(trackId.getTrackId()))) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_DUPLICATE);
+        }
     }
 
     private void validateTrackOrderCount(PlaylistOrders playlistOrders, List<PlaylistTrack> playlistTracks) {
@@ -212,6 +209,13 @@ public class PlaylistServiceImpl implements PlaylistService {
         if (!playlistTrackIds.equals(orderTrackIds)) {
             throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_ID_MISMATCH);
         }
+    }
+
+    private PlaylistTrack findPlaylistTrackByTrack(List<PlaylistTrack> playlistTracks, Track track) {
+        return playlistTracks.stream()
+                .filter(pt -> pt.getTrack().getId().equals(track.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_NOT_FOUND));
     }
 
     private Track findTrackById(Long trackId) {
