@@ -4,6 +4,7 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistOrders;
+import com.cabin.plat.domain.playlist.dto.PlaylistRequest.TrackOrder;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse.PlayListId;
 import com.cabin.plat.domain.playlist.entity.Playlist;
@@ -146,14 +147,55 @@ public class PlaylistServiceImpl implements PlaylistService {
         return playlistMapper.toPlaylistId(playlistId);
     }
 
+    @Transactional
     @Override
     public PlayListId updateTrackOrders(Member member, Long playlistId, PlaylistOrders playlistOrders) {
-        return null;
+        Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
+
+        // 기존 플레이리스트의 모든 트랙
+        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+
+        // 플레이리스트의 업데이트할 트랙 순서 정보
+        Map<Long, Integer> trackOrderMap = playlistOrders.getTracks().stream()
+                .collect(Collectors.toMap(TrackOrder::getTrackId, TrackOrder::getOrderIndex));
+
+        validateTrackOrderCount(playlistOrders, playlistTracks);
+        validateTrackIds(playlistOrders, playlistTracks);
+
+        for (PlaylistTrack playlistTrack: playlistTracks) {
+            Long trackId = playlistTrack.getTrack().getId();
+            int newOrder = trackOrderMap.get(trackId);
+            playlistTrack.setOrderIndex(newOrder);
+        }
+
+//        playlistTrackRepository.saveAll(playlistTracks);
+        return playlistMapper.toPlaylistId(playlistId);
     }
 
+    @Transactional
     @Override
     public PlayListId deleteTrackFromPlaylist(Member member, Long playlistId, Long trackId) {
         return null;
+    }
+
+    private void validateTrackOrderCount(PlaylistOrders playlistOrders, List<PlaylistTrack> playlistTracks) {
+        if (playlistOrders.getTracks().size() != playlistTracks.size()) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_COUNT_MISMATCH);
+        }
+    }
+
+    private void validateTrackIds(PlaylistOrders playlistOrders, List<PlaylistTrack> playlistTracks) {
+        Set<Long> playlistTrackIds = playlistTracks.stream()
+                .map(playlistTrack -> playlistTrack.getTrack().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> orderTrackIds = playlistOrders.getTracks().stream()
+                .map(TrackOrder::getTrackId)
+                .collect(Collectors.toSet());
+
+        if (!playlistTrackIds.equals(orderTrackIds)) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_ID_MISMATCH);
+        }
     }
 
     private Track findTrackById(Long trackId) {

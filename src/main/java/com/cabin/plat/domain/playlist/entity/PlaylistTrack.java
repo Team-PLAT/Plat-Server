@@ -26,6 +26,7 @@ public class PlaylistTrack extends BaseEntity {
     @JoinColumn(name = "track_id", nullable = false)
     private Track track;
 
+    @Setter
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 }
