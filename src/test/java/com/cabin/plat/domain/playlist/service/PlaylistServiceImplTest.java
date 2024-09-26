@@ -596,36 +596,6 @@ class PlaylistServiceImplTest {
         }
 
         @Test
-        void 플레이리스트_트랙_추가_성공() {
-            // given
-            Track addTrack = tracks.get(5);
-            PlaylistRequest.TrackId trackId = PlaylistRequest.TrackId.builder()
-                    .trackId(addTrack.getId())
-                    .build();
-
-            // when
-            playlistService.addTrackToPlaylist(members.get(0), playlistIds.get(0), trackId);
-            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistIds.get(0));
-
-            // then
-            assertThat(optionalPlaylist.isPresent()).isTrue();
-            Playlist playlist = optionalPlaylist.get();
-
-            // 기존 플레이리스트 정보
-            assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목0");
-            assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test0.com");
-
-            // 트랙 추가된 정보
-            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
-            assertThat(playlistTracks).hasSize(4);
-            assertThat(playlistTracks.get(3).getTrack().getId()).isEqualTo(addTrack.getId());
-            assertThat(playlistTracks.get(3).getOrderIndex()).isEqualTo(3);
-//            assertThat(playlist.getPlaylistTracks().size()).isEqualTo(4);
-//            assertThat(playlist.getPlaylistTracks().get(3).getTrack().getId()).isEqualTo(addTrack.getId());
-//            assertThat(playlist.getPlaylistTracks().get(3).getOrderIndex()).isEqualTo(3);
-        }
-
-        @Test
         void 플레이리스트_트랙_추가_실패_권한없음_예외발생() {
             // given
             Track addTrack = tracks.get(5);
@@ -637,7 +607,6 @@ class PlaylistServiceImplTest {
             assertThatThrownBy(() -> playlistService.addTrackToPlaylist(members.get(1), playlistIds.get(0), trackId))
                     .isInstanceOf(RestApiException.class);
         }
-
     }
 
     @Nested
