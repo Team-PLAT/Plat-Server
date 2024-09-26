@@ -105,10 +105,11 @@ public class PlaylistServiceImpl implements PlaylistService {
         List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
         List<PlaylistResponse.TrackDetailOrder> trackDetailOrders = playlistTracks.stream()
                 .map(playlistTrack -> {
-                    TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member,
-                            playlistTrack.getTrack().getId());
+                    TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member, playlistTrack.getTrack().getId());
                     return playlistMapper.toTrackDetailOrder(playlistTrack, trackDetail);
-                }).toList();
+                })
+                .sorted(Comparator.comparingInt(PlaylistResponse.TrackDetailOrder::getOrderIndex))
+                .toList();
         return playlistMapper.toPlaylistDetail(playlist, trackDetailOrders);
     }
 
