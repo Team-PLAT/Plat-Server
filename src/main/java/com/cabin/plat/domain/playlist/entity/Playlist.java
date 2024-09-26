@@ -30,4 +30,9 @@ public class Playlist extends BaseEntity {
 
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
     private List<PlaylistTrack> playlistTracks;
+
+    public void updatePlaylist(String title, String playlistImageUrl) {
+        this.title = title;
+        this.playlistImageUrl = playlistImageUrl;
+    }
 }

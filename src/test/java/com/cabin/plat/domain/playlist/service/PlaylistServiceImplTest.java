@@ -8,7 +8,6 @@ import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload.TrackOrder;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
-import com.cabin.plat.domain.playlist.dto.PlaylistResponse.Playlists;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse.Playlists.PlaylistInfo;
 import com.cabin.plat.domain.playlist.entity.Playlist;
 import com.cabin.plat.domain.playlist.entity.PlaylistTrack;
@@ -476,7 +475,7 @@ class PlaylistServiceImplTest {
             Long playlistId = playlistIds.get(0);
 
             // when
-            playlistService.updatePlaylist(member, playlistId, newPlaylistUpload);
+            playlistService.updatePlaylistTitleAndImage(member, playlistId, newPlaylistUpload);
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
 
             // then
@@ -499,7 +498,7 @@ class PlaylistServiceImplTest {
             Long playlistId = playlistIds.get(0);
 
             // when
-            playlistService.updatePlaylist(member, playlistId, newPlaylistUpload);
+            playlistService.updatePlaylistTitleAndImage(member, playlistId, newPlaylistUpload);
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
 
             // then
@@ -522,7 +521,7 @@ class PlaylistServiceImplTest {
             Long playlistId = playlistIds.get(0);
 
             // when then
-            assertThatThrownBy(() -> playlistService.updatePlaylist(member, playlistId, newPlaylistUpload))
+            assertThatThrownBy(() -> playlistService.updatePlaylistTitleAndImage(member, playlistId, newPlaylistUpload))
                     .isInstanceOf(RestApiException.class);
         }
     }

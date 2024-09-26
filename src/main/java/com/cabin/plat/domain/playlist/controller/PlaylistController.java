@@ -73,7 +73,7 @@ public class PlaylistController {
             @PathVariable("playlistId") Long playlistId,
             @RequestBody PlaylistUpload playlistUpload) {
 
-        return BaseResponse.onSuccess(playlistService.updatePlaylist(member, playlistId, playlistUpload));
+        return BaseResponse.onSuccess(playlistService.updatePlaylistTitleAndImage(member, playlistId, playlistUpload));
     }
 
     @Operation(summary = "플레이리스트에 트랙 추가", description = "플레이리스트에 트랙을 추가한다.")

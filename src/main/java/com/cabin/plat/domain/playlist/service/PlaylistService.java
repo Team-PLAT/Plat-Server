@@ -10,6 +10,6 @@ public interface PlaylistService {
     PlaylistResponse.Playlists getSearchedPlaylists(Member member, String title, int page, int size);
     PlaylistResponse.PlayListId deletePlaylist(Member member, Long playlistId);
     PlaylistResponse.PlaylistDetail getPlaylistDetail(Member member, Long playlistId);
-    PlaylistResponse.PlayListId updatePlaylist(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload);
+    PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload);
     PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, PlaylistRequest.TrackId trackId);
 }

@@ -17,6 +17,7 @@ import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.PlaylistErrorCode;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -111,19 +112,22 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Transactional
     @Override
-    public PlaylistResponse.PlayListId updatePlaylist(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload) {
+    public PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload) {
         Playlist playlist = findPlaylistById(playlistId);
         if (!playlist.getMember().equals(member)) {
             throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
         }
-        // TODO: 플레이리스트 업데이트
+
+        // 제목 및 이미지 변경
+        playlist.updatePlaylist(playlistUpload.getTitle(), playlistUpload.getPlaylistImageUrl());
+        playlistRepository.save(playlist);
+
         return playlistMapper.toPlaylistId(playlistId);
     }
 
     @Transactional
     @Override
     public PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, PlaylistRequest.TrackId trackId) {
-        // TODO: 트랙 이미 추가된건지 중복 검사
         Playlist playlist = findPlaylistById(playlistId);
         Track track = findTrackById(trackId.getTrackId());
         if (!playlist.getMember().equals(member)) {
