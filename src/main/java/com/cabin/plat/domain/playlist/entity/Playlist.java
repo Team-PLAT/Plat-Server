@@ -3,7 +3,7 @@ package com.cabin.plat.domain.playlist.entity;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.global.common.BaseEntity;
 import jakarta.persistence.*;
-import java.util.List;
+import java.util.Set;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -29,7 +29,7 @@ public class Playlist extends BaseEntity {
     private String playlistImageUrl;
 
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
-    private List<PlaylistTrack> playlistTracks;
+    private Set<PlaylistTrack> playlistTracks;
 
     public void updatePlaylist(String title, String playlistImageUrl) {
         this.title = title;
