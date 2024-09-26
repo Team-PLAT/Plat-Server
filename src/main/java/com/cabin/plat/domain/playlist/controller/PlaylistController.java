@@ -84,4 +84,25 @@ public class PlaylistController {
 
         return BaseResponse.onSuccess(playlistService.addTrackToPlaylist(member, playlistId, trackId));
     }
+
+    @Operation(summary = "플레이리스트 트랙 순서 변경", description = "플레이리스트 내부의 트랙의 순서를 변경한다.")
+    @PatchMapping("/{playlistId}/tracks/order")
+    public BaseResponse<PlaylistResponse.PlayListId> updateTrackOrders(
+            @AuthMember Member member,
+            @PathVariable("playlistId") Long playlistId,
+            @RequestBody PlaylistRequest.PlaylistOrders playlistOrders) {
+
+        return BaseResponse.onSuccess(playlistService.updateTrackOrders(member, playlistId, playlistOrders));
+    }
+
+    @Operation(summary = "플레이리스트에서 트랙 삭제", description = "플레이리스트 내부의 트랙을 삭제합니다.")
+    @DeleteMapping("/{playlistId}/tracks/{trackId}")
+    public BaseResponse<PlaylistResponse.PlayListId> deleteTrackFromPlaylist(
+            @AuthMember Member member,
+            @PathVariable("playlistId") Long playlistId,
+            @PathVariable("trackId") Long trackId) {
+
+        return BaseResponse.onSuccess(playlistService.deleteTrackFromPlaylist(member, playlistId, trackId));
+    }
+
 }

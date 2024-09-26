@@ -12,4 +12,6 @@ public interface PlaylistService {
     PlaylistResponse.PlaylistDetail getPlaylistDetail(Member member, Long playlistId);
     PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId, PlaylistRequest.PlaylistEdit playlistEdit);
     PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, PlaylistRequest.TrackId trackId);
+    PlaylistResponse.PlayListId updateTrackOrders(Member member,Long playlistId,PlaylistRequest.PlaylistOrders playlistOrders);
+    PlaylistResponse.PlayListId deleteTrackFromPlaylist(Member member,Long playlistId,Long trackId);
 }

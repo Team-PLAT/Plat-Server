@@ -3,7 +3,9 @@ package com.cabin.plat.domain.playlist.service;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
+import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistOrders;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
+import com.cabin.plat.domain.playlist.dto.PlaylistResponse.PlayListId;
 import com.cabin.plat.domain.playlist.entity.Playlist;
 import com.cabin.plat.domain.playlist.entity.PlaylistTrack;
 import com.cabin.plat.domain.playlist.mapper.PlaylistMapper;
@@ -150,6 +152,16 @@ public class PlaylistServiceImpl implements PlaylistService {
         PlaylistTrack playlistTrack = playlistMapper.toPlaylistTrack(playlist, track, nextOrderIndex);
         playlistTrackRepository.save(playlistTrack);
         return playlistMapper.toPlaylistId(playlistId);
+    }
+
+    @Override
+    public PlayListId updateTrackOrders(Member member, Long playlistId, PlaylistOrders playlistOrders) {
+        return null;
+    }
+
+    @Override
+    public PlayListId deleteTrackFromPlaylist(Member member, Long playlistId, Long trackId) {
+        return null;
     }
 
     private Track findTrackById(Long trackId) {
