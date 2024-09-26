@@ -728,16 +728,32 @@ class PlaylistServiceImplTest {
             Long deleteTrackId = tracks.get(1).getId();
 
             // when
-            PlaylistResponse.PlayListId playListId = playlistService.deleteTrackFromPlaylist(member, playlistId, deleteTrackId);
+            PlaylistResponse.PlayListId responsePlaylistId = playlistService.deleteTrackFromPlaylist(member, playlistId, deleteTrackId);
 
             // then
-            assertThat(playListId.getPlaylistId()).isEqualTo(playlistId);
+            assertThat(responsePlaylistId.getPlaylistId()).isEqualTo(playlistId);
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
             assertThat(optionalPlaylist.isPresent()).isTrue();
             List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(optionalPlaylist.get());
             assertThat(playlistTracks).hasSize(2);
             assertThat(playlistTracks).allSatisfy(pt -> assertThat(pt.getOrderIndex()).isLessThan(3));
             assertThat(playlistTracks).noneMatch(pt -> pt.getTrack().getId().equals(deleteTrackId));
+        }
+
+        @Test
+        void 플레이리스트에서_트랙_삭제_성공_남은_트랙_순서_정렬() {
+            // given
+            Member member = members.get(0);
+            Long playlistId = playlistIds.get(0);
+            Long deleteTrackId = tracks.get(1).getId();
+
+            // when
+            PlaylistResponse.PlayListId responsePlaylistId = playlistService.deleteTrackFromPlaylist(member, playlistId, deleteTrackId);
+
+            // then
+            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+            assertThat(optionalPlaylist.isPresent()).isTrue();
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(optionalPlaylist.get());
 
             // orderIndex 값들이 0부터 시작하여 하나씩 증가하는지 확인
             List<Integer> orderIndexes = playlistTracks.stream()

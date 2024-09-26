@@ -118,7 +118,6 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         // 제목 및 이미지 변경
         playlist.updatePlaylist(playlistEdit.getTitle(), playlistEdit.getPlaylistImageUrl());
-        playlistRepository.save(playlist);
 
         return playlistMapper.toPlaylistId(playlistId);
     }
@@ -168,14 +167,31 @@ public class PlaylistServiceImpl implements PlaylistService {
             playlistTrack.setOrderIndex(newOrder);
         }
 
-//        playlistTrackRepository.saveAll(playlistTracks);
         return playlistMapper.toPlaylistId(playlistId);
     }
 
     @Transactional
     @Override
     public PlayListId deleteTrackFromPlaylist(Member member, Long playlistId, Long trackId) {
-        return null;
+        Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
+        Track track = findTrackById(trackId);
+
+        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+        PlaylistTrack playlistTrack = findPlaylistTrackByTrack(playlistTracks, track);
+        playlistTrack.delete();
+
+        int deletedOrderIndex = playlistTrack.getOrderIndex();
+        playlistTracks.stream()
+                .filter(pt -> pt.getOrderIndex() > deletedOrderIndex)
+                .forEach(pt -> pt.setOrderIndex(pt.getOrderIndex() - 1));
+        return playlistMapper.toPlaylistId(playlistId);
+    }
+
+    private PlaylistTrack findPlaylistTrackByTrack(List<PlaylistTrack> playlistTracks, Track track) {
+        return playlistTracks.stream()
+                .filter(pt -> pt.getTrack().getId().equals(track.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_NOT_FOUND));
     }
 
     private void validateTrackOrderCount(PlaylistOrders playlistOrders, List<PlaylistTrack> playlistTracks) {
