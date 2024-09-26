@@ -3,7 +3,6 @@ package com.cabin.plat.domain.playlist.controller;
 import com.cabin.plat.config.AuthMember;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
-import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
 import com.cabin.plat.domain.playlist.service.PlaylistService;
 import com.cabin.plat.global.common.BaseResponse;
@@ -23,7 +22,7 @@ public class PlaylistController {
     @PostMapping
     public BaseResponse<PlaylistResponse.PlayListId> addPlaylist(
             @AuthMember Member member,
-            @RequestBody PlaylistUpload playlistUpload) {
+            @RequestBody PlaylistRequest.PlaylistUpload playlistUpload) {
 
         return BaseResponse.onSuccess(playlistService.addPlaylist(member, playlistUpload));
     }
@@ -66,14 +65,14 @@ public class PlaylistController {
         return BaseResponse.onSuccess(playlistService.getPlaylistDetail(member, playlistId));
     }
 
-    @Operation(summary = "플레이리스트 수정", description = "플레이리스트 사진과 제목과 트랙 순서를 편집한다.")
+    @Operation(summary = "플레이리스트 정보 수정", description = "플레이리스트 사진과 제목을 편집한다.")
     @PatchMapping("/{playlistId}")
     public BaseResponse<PlaylistResponse.PlayListId> updatePlaylist(
             @AuthMember Member member,
             @PathVariable("playlistId") Long playlistId,
-            @RequestBody PlaylistUpload playlistUpload) {
+            @RequestBody PlaylistRequest.PlaylistEdit playlistEdit) {
 
-        return BaseResponse.onSuccess(playlistService.updatePlaylistTitleAndImage(member, playlistId, playlistUpload));
+        return BaseResponse.onSuccess(playlistService.updatePlaylistTitleAndImage(member, playlistId, playlistEdit));
     }
 
     @Operation(summary = "플레이리스트에 트랙 추가", description = "플레이리스트에 트랙을 추가한다.")

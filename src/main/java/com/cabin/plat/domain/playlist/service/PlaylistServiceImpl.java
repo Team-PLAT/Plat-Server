@@ -42,7 +42,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         Playlist playlist = playlistMapper.toPlaylist(member, playlistUpload);
         playlistRepository.save(playlist);
 
-        List<PlaylistRequest.PlaylistUpload.TrackOrder> trackOrders = playlistUpload.getTracks();
+        List<PlaylistRequest.TrackOrder> trackOrders = playlistUpload.getTracks();
         List<PlaylistTrack> playlistTracks = trackOrders.stream()
                 .map(trackOrder -> {
                     Track track = findTrackById(trackOrder.getTrackId());
@@ -112,14 +112,14 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Transactional
     @Override
-    public PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId, PlaylistRequest.PlaylistUpload playlistUpload) {
+    public PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId, PlaylistRequest.PlaylistEdit playlistEdit) {
         Playlist playlist = findPlaylistById(playlistId);
         if (!playlist.getMember().equals(member)) {
             throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
         }
 
         // 제목 및 이미지 변경
-        playlist.updatePlaylist(playlistUpload.getTitle(), playlistUpload.getPlaylistImageUrl());
+        playlist.updatePlaylist(playlistEdit.getTitle(), playlistEdit.getPlaylistImageUrl());
         playlistRepository.save(playlist);
 
         return playlistMapper.toPlaylistId(playlistId);
