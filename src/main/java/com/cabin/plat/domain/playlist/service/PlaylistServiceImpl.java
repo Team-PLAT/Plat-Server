@@ -134,12 +134,18 @@ public class PlaylistServiceImpl implements PlaylistService {
             throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
         }
 
-        // TODO: playlist.getPlaylistTracks 를 가져와서 orderIndex 계산
+        // TODO: playlist.getPlaylistTracks 로 가져오기 (현재는 playlistTrackRepository.findAllByPlaylistIs(playlist) 로 대체)
         List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+
+        if (playlistTracks.stream().anyMatch(playlistTrack -> playlistTrack.getTrack().getId().equals(trackId.getTrackId()))) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_DUPLICATE);
+        }
+
         int nextOrderIndex = playlistTracks.isEmpty() ? 0 : playlistTracks.stream()
                 .mapToInt(PlaylistTrack::getOrderIndex)
                 .max()
                 .orElse(0) + 1;
+
 
         PlaylistTrack playlistTrack = playlistMapper.toPlaylistTrack(playlist, track, nextOrderIndex);
         playlistTrackRepository.save(playlistTrack);
