@@ -19,6 +19,7 @@ import com.cabin.plat.domain.track.repository.LocationRepository;
 import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.global.exception.RestApiException;
 import java.util.*;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -718,8 +719,61 @@ class PlaylistServiceImplTest {
 
     @Nested
     class DeleteTrackFromPlaylistTest {
-        // 플레이리스트에서 트랙 삭제
-        // 트랙이 없을 경우 예외 발생
-        // 권한 체크 및 플레이리스트 업로더 아닐 경우 예외 발생
+
+        @Test
+        void 플레이리스트에서_트랙_삭제_성공() {
+            // given
+            Member member = members.get(0);
+            Long playlistId = playlistIds.get(0);
+            Long deleteTrackId = tracks.get(1).getId();
+
+            // when
+            PlaylistResponse.PlayListId playListId = playlistService.deleteTrackFromPlaylist(member, playlistId, deleteTrackId);
+
+            // then
+            assertThat(playListId.getPlaylistId()).isEqualTo(playlistId);
+            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+            assertThat(optionalPlaylist.isPresent()).isTrue();
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(optionalPlaylist.get());
+            assertThat(playlistTracks).hasSize(2);
+            assertThat(playlistTracks).allSatisfy(pt -> assertThat(pt.getOrderIndex()).isLessThan(3));
+            assertThat(playlistTracks).noneMatch(pt -> pt.getTrack().getId().equals(deleteTrackId));
+
+            // orderIndex 값들이 0부터 시작하여 하나씩 증가하는지 확인
+            List<Integer> orderIndexes = playlistTracks.stream()
+                    .map(PlaylistTrack::getOrderIndex)
+                    .sorted()
+                    .toList();
+
+            int orderSize = orderIndexes.size();
+            List<Integer> list = IntStream.range(0, orderSize)
+                    .boxed()
+                    .toList();
+            assertThat(orderIndexes).containsExactlyElementsOf(list);
+        }
+
+        @Test
+        void 플레이리스트에서_트랙_삭제_실패_트랙없음_예외발생() {
+            // given
+            Member member = members.get(0);
+            Long playlistId = playlistIds.get(0);
+            Long nonExistentTrackId = tracks.get(3).getId(); // 플레이리스트에 없는 트랙
+
+            // when then
+            assertThatThrownBy(() -> playlistService.deleteTrackFromPlaylist(member, playlistId, nonExistentTrackId))
+                    .isInstanceOf(RestApiException.class);
+        }
+
+        @Test
+        void 플레이리스트에서_트랙_삭제_실패_권한없음_예외발생() {
+            // given
+            Member member = members.get(1); // 플레이리스트 만든 유저 아님
+            Long playlistId = playlistIds.get(0);
+            Long trackId = tracks.get(0).getId();
+
+            // when then
+            assertThatThrownBy(() -> playlistService.deleteTrackFromPlaylist(member, playlistId, trackId))
+                    .isInstanceOf(RestApiException.class);
+        }
     }
 }
