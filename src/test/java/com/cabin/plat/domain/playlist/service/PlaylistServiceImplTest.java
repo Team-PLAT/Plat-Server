@@ -154,8 +154,8 @@ class PlaylistServiceImplTest {
                 .build();
 
         PlaylistRequest.PlaylistUpload playlistUpload2 = PlaylistUpload.builder()
-                .title("플레이리스트 제목3")
-                .playlistImageUrl("https://test3.com")
+                .title("플레이리스트 제목2")
+                .playlistImageUrl("https://test2.com")
                 .tracks(List.of(
                         TrackOrder.builder()
                                 .trackId(tracks.get(0).getId())
@@ -184,14 +184,21 @@ class PlaylistServiceImplTest {
                 ))
                 .build();
 
-        return List.of(playlistUpload0, playlistUpload1, playlistUpload2);
+        PlaylistRequest.PlaylistUpload playlistUpload3 = PlaylistUpload.builder()
+                .title("플레이리스트 제목3")
+                .playlistImageUrl("https://test3.com")
+                .tracks(Collections.emptyList())
+                .build();
+
+        return List.of(playlistUpload0, playlistUpload1, playlistUpload2, playlistUpload3);
     }
 
     private List<Long> createTestPlaylists(List<Member> members, List<PlaylistUpload> playlistUploads) {
         Long playlistId0 = playlistService.addPlaylist(members.get(0), playlistUploads.get(0)).getPlaylistId();
         Long playlistId1 = playlistService.addPlaylist(members.get(1), playlistUploads.get(1)).getPlaylistId();
         Long playlistId2 = playlistService.addPlaylist(members.get(1), playlistUploads.get(2)).getPlaylistId();
-        return List.of(playlistId0, playlistId1, playlistId2);
+        Long playlistId3 = playlistService.addPlaylist(members.get(1), playlistUploads.get(3)).getPlaylistId();
+        return List.of(playlistId0, playlistId1, playlistId2, playlistId3);
     }
 
     @Nested
@@ -207,7 +214,7 @@ class PlaylistServiceImplTest {
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId); // 저장된 플레이리스트 확인
 
             // then
-            assertThat(playlists).hasSize(3);
+            assertThat(playlists).hasSize(4);
             assertThat(optionalPlaylist.isPresent()).isTrue();
             Playlist playlist = optionalPlaylist.get();
 
@@ -269,7 +276,7 @@ class PlaylistServiceImplTest {
 
             // then
             assertThat(playlists0.getPlaylists()).hasSize(1);
-            assertThat(playlists1.getPlaylists()).hasSize(2);
+            assertThat(playlists1.getPlaylists()).hasSize(3);
             assertThat(playlistInfo0)
                     .usingRecursiveComparison()
                     .ignoringFields("createdAt")
@@ -285,11 +292,13 @@ class PlaylistServiceImplTest {
             PlaylistResponse.Playlists pagedPlaylists0 = playlistService.getPlaylists(member1, 0, 1);
             PlaylistResponse.Playlists pagedPlaylists1 = playlistService.getPlaylists(member1, 1, 1);
             PlaylistResponse.Playlists pagedPlaylists2 = playlistService.getPlaylists(member1, 2, 1);
+            PlaylistResponse.Playlists pagedPlaylists3 = playlistService.getPlaylists(member1, 3, 1);
 
             // then
             assertThat(pagedPlaylists0.getPlaylists()).hasSize(1);
             assertThat(pagedPlaylists1.getPlaylists()).hasSize(1);
-            assertThat(pagedPlaylists2.getPlaylists()).hasSize(0);
+            assertThat(pagedPlaylists2.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists3.getPlaylists()).hasSize(0);
         }
 
         @Test
@@ -340,11 +349,13 @@ class PlaylistServiceImplTest {
             PlaylistResponse.Playlists pagedPlaylists0 = playlistService.getSearchedPlaylists(member, "플레이리스트", 0, 1);
             PlaylistResponse.Playlists pagedPlaylists1 = playlistService.getSearchedPlaylists(member, "플레이리스트", 1, 1);
             PlaylistResponse.Playlists pagedPlaylists2 = playlistService.getSearchedPlaylists(member, "플레이리스트", 2, 1);
+            PlaylistResponse.Playlists pagedPlaylists3 = playlistService.getSearchedPlaylists(member, "플레이리스트", 3, 1);
 
             // then
             assertThat(pagedPlaylists0.getPlaylists()).hasSize(1);
             assertThat(pagedPlaylists1.getPlaylists()).hasSize(1);
-            assertThat(pagedPlaylists2.getPlaylists()).hasSize(0);
+            assertThat(pagedPlaylists2.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists3.getPlaylists()).hasSize(0);
         }
 
         @Test
@@ -452,7 +463,6 @@ class PlaylistServiceImplTest {
 
     @Nested
     class UpdatePlaylistTests {
-
 //        private PlaylistRequest.PlaylistUpload newPlaylistUpload = PlaylistUpload.builder()
 //                .title("플레이리스트 제목2")
 //                .playlistImageUrl("https://test2.com")
@@ -526,12 +536,65 @@ class PlaylistServiceImplTest {
 //        }
     }
 
-
     @Nested
     class AddTrackToPlaylistTest {
 
-        // TODO: 0개 있을떄 추가 해서 인덱스 확인
-        // TODO: 1개 이상 있을때 추가 해서 인덱스 확인
+        @Test
+        void 플레이리스트_트랙_추가_성공_0개_있을때() {
+            // given
+            Track addTrack = tracks.get(0);
+            PlaylistRequest.TrackId trackId = PlaylistRequest.TrackId.builder()
+                    .trackId(addTrack.getId())
+                    .build();
+            Long playlistId = playlistIds.get(3);
+
+            // when
+            playlistService.addTrackToPlaylist(members.get(1), playlistId, trackId);
+            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+
+            // then
+            assertThat(optionalPlaylist.isPresent()).isTrue();
+            Playlist playlist = optionalPlaylist.get();
+
+            // 기존 플레이리스트 정보
+            assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목3");
+            assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test3.com");
+
+            // 트랙 추가된 정보
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+            assertThat(playlistTracks).hasSize(1);
+            assertThat(playlistTracks.get(0).getTrack().getId()).isEqualTo(addTrack.getId());
+            assertThat(playlistTracks.get(0).getOrderIndex()).isEqualTo(0);
+        }
+
+        @Test
+        void 플레이리스트_트랙_추가_성공_1개_이상_있을때() {
+            // given
+            Track addTrack = tracks.get(5);
+            PlaylistRequest.TrackId trackId = PlaylistRequest.TrackId.builder()
+                    .trackId(addTrack.getId())
+                    .build();
+            Long playlistId = playlistIds.get(0);
+
+            // when
+            playlistService.addTrackToPlaylist(members.get(0), playlistId, trackId);
+            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+
+            // then
+            assertThat(optionalPlaylist.isPresent()).isTrue();
+            Playlist playlist = optionalPlaylist.get();
+
+            // 기존 플레이리스트 정보
+            assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목0");
+            assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test0.com");
+
+            // 트랙 추가된 정보
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+            assertThat(playlistTracks).hasSize(4);
+            assertThat(playlistTracks.get(3).getTrack().getId()).isEqualTo(addTrack.getId());
+            assertThat(playlistTracks.get(3).getOrderIndex()).isEqualTo(3);
+        }
+
         @Test
         void 플레이리스트_트랙_추가_성공() {
             // given
@@ -575,5 +638,19 @@ class PlaylistServiceImplTest {
                     .isInstanceOf(RestApiException.class);
         }
 
+    }
+
+    @Nested
+    class UpdateTrackOrdersTest {
+        // 받은 데이터로 모든 트랙 순서 변경
+        // 트랙 개수가 안맞거나 디비에서의 트랙 정보와 다를 경우 예외 발생? 덮어쓰기?
+        // 권한 체크 및 플레이리스트 업로더 아닐 경우 예외 발생
+    }
+
+    @Nested
+    class DeleteTrackFromPlaylistTest {
+        // 플레이리스트에서 트랙 삭제
+        // 트랙이 없을 경우 예외 발생
+        // 권한 체크 및 플레이리스트 업로더 아닐 경우 예외 발생
     }
 }
