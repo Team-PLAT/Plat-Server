@@ -227,7 +227,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     private Playlist findPlaylistByIdWithValidation(Long playlistId, Member member) {
         Playlist playlist = findPlaylistById(playlistId);
         if (!playlist.getMember().equals(member)) {
-            throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_FORBIDDEN);
         }
         return playlist;
     }
