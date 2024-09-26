@@ -1,7 +1,6 @@
 package com.cabin.plat.domain.playlist.service;
 
 import com.cabin.plat.domain.member.entity.Member;
-import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistOrders;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.TrackId;
@@ -35,7 +34,6 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     private final TrackService trackService;
     private final PlaylistRepository playlistRepository;
-    private final MemberRepository memberRepository;
     private final TrackRepository trackRepository;
     private final PlaylistTrackRepository playlistTrackRepository;
     private final PlaylistMapper playlistMapper;
@@ -68,8 +66,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         // TODO: 효율 개선
         List<Playlist> playlists = playlistRepository.findAllByMember(member, pageable).getContent();
         List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
-            // TODO: playlist.getPlaylistTracks 를 가져오기
-            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+            List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(playlist);
             return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
         }).toList();
         return playlistMapper.toPlaylists(playlistInfos);
@@ -77,14 +74,22 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public PlaylistResponse.Playlists getSearchedPlaylists(Member member, String title, int page, int size) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createdAt"));
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sorts));
+        String refinedTitle = title.trim()                        // 앞뒤 공백 제거
+                .replaceAll("\\s+", " ")       // 다중 공백을 하나로 변환
+                .toLowerCase();
 
-        List<Playlist> playlists = playlistRepository.findAllByMemberAndTitleContaining(member, title, pageable).getContent();
+        if (refinedTitle.isEmpty() || refinedTitle.isBlank()) {
+            return playlistMapper.toPlaylists(Collections.emptyList());
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        List<Playlist> playlists = playlistRepository.
+                findAllByMemberAndTitleContainingIgnoreCase(member, refinedTitle, pageable).getContent();
+
+        // TODO: 효율 개선
         List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
-            // TODO: playlist.getPlaylistTracks 를 가져오기
-            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+            List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(playlist);
             return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
         }).toList();
         return playlistMapper.toPlaylists(playlistInfos);
@@ -101,8 +106,9 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Override
     public PlaylistResponse.PlaylistDetail getPlaylistDetail(Member member, Long playlistId) {
         Playlist playlist = findPlaylistById(playlistId);
-        // TODO: playlist.getPlaylistTracks 를 가져오기
-        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+
+        List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(
+                playlist);
         List<PlaylistResponse.TrackDetailOrder> trackDetailOrders = playlistTracks.stream()
                 .map(playlistTrack -> {
                     TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member, playlistTrack.getTrack().getId());
@@ -130,8 +136,8 @@ public class PlaylistServiceImpl implements PlaylistService {
         Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
         Track track = findTrackById(trackId.getTrackId());
 
-        // TODO: playlist.getPlaylistTracks 로 가져오기 (현재는 playlistTrackRepository.findAllByPlaylistIs(playlist) 로 대체)
-        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+        List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(
+                playlist);
 
         validateTrackDuplicateInPlaylist(trackId, playlistTracks);
 
@@ -151,7 +157,8 @@ public class PlaylistServiceImpl implements PlaylistService {
         Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
 
         // 기존 플레이리스트의 모든 트랙
-        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+        List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(
+                playlist);
 
         // 플레이리스트의 업데이트할 트랙 순서 정보
         Map<Long, Integer> trackOrderMap = playlistOrders.getTracks().stream()
@@ -175,7 +182,8 @@ public class PlaylistServiceImpl implements PlaylistService {
         Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
         Track track = findTrackById(trackId);
 
-        List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+        List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(
+                playlist);
         PlaylistTrack playlistTrack = findPlaylistTrackByTrack(playlistTracks, track);
         playlistTrack.delete();
 
@@ -184,6 +192,11 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .filter(pt -> pt.getOrderIndex() > deletedOrderIndex)
                 .forEach(pt -> pt.setOrderIndex(pt.getOrderIndex() - 1));
         return playlistMapper.toPlaylistId(playlistId);
+    }
+
+    private List<PlaylistTrack> findPlaylistTracksInPlaylist(Playlist playlist) {
+        // TODO: playlist.getPlaylistTracks 를 가져오기
+        return playlistTrackRepository.findAllByPlaylistIs(playlist);
     }
 
     private static void validateTrackDuplicateInPlaylist(TrackId trackId, List<PlaylistTrack> playlistTracks) {
