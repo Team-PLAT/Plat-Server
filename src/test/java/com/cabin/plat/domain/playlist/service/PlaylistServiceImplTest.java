@@ -611,9 +611,109 @@ class PlaylistServiceImplTest {
 
     @Nested
     class UpdateTrackOrdersTest {
-        // 받은 데이터로 모든 트랙 순서 변경
-        // 트랙 개수가 안맞거나 디비에서의 트랙 정보와 다를 경우 예외 발생? 덮어쓰기?
-        // 권한 체크 및 플레이리스트 업로더 아닐 경우 예외 발생
+
+        @Test
+        void 받은_데이터로_모든_트랙_순서_변경() {
+            // given
+            Member member = members.get(0);
+            Long playlistId = playlistIds.get(0);
+            PlaylistRequest.PlaylistOrders playlistOrders = PlaylistRequest.PlaylistOrders.builder()
+                    .tracks(List.of(
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(0).getId())
+                                    .orderIndex(2).build(),
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(1).getId())
+                                    .orderIndex(0).build(),
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(2).getId())
+                                    .orderIndex(1).build()
+                    ))
+                    .build();
+
+            // when
+            playlistService.updateTrackOrders(member, playlistId, playlistOrders);
+            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+
+            // then
+            assertThat(optionalPlaylist.isPresent()).isTrue();
+            Playlist playlist = optionalPlaylist.get();
+            List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
+
+            assertThat(playlistTracks).hasSize(3);
+            assertThat(playlistTracks.get(0).getOrderIndex()).isEqualTo(2);
+            assertThat(playlistTracks.get(1).getOrderIndex()).isEqualTo(0);
+            assertThat(playlistTracks.get(2).getOrderIndex()).isEqualTo(1);
+        }
+
+        @Test
+        void 트랙_개수_불일치_예외발생() {
+            // given
+            Member member = members.get(0);
+            Long playlistId = playlistIds.get(0);
+            PlaylistRequest.PlaylistOrders playlistOrders = PlaylistRequest.PlaylistOrders.builder()
+                    .tracks(List.of(
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(0).getId())
+                                    .orderIndex(2).build(),
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(1).getId())
+                                    .orderIndex(0).build()
+                    ))
+                    .build();
+
+            // when then
+            assertThatThrownBy(() -> playlistService.updateTrackOrders(member, playlistId, playlistOrders))
+                    .isInstanceOf(RestApiException.class);
+        }
+
+        @Test
+        void 트랙_정보_불일치_예외발생() {
+            // given
+            Member member = members.get(0);
+            Long playlistId = playlistIds.get(0);
+            PlaylistRequest.PlaylistOrders playlistOrders = PlaylistRequest.PlaylistOrders.builder()
+                    .tracks(List.of(
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(0).getId())
+                                    .orderIndex(2).build(),
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(1).getId())
+                                    .orderIndex(0).build(),
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(3).getId()) // 플레이리스트에 없는 트랙
+                                    .orderIndex(1).build()
+                    ))
+                    .build();
+
+            // when then
+            assertThatThrownBy(() -> playlistService.updateTrackOrders(member, playlistId, playlistOrders))
+                    .isInstanceOf(RestApiException.class);
+        }
+
+        @Test
+        void 트랙_순서_변경_실패_권한없음_예외발생() {
+            // given
+            Long playlistId = playlistIds.get(0);
+            Member member = members.get(1); // 플레이리스트 만든 유저 아님
+            PlaylistRequest.PlaylistOrders playlistOrders = PlaylistRequest.PlaylistOrders.builder()
+                    .tracks(List.of(
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(0).getId())
+                                    .orderIndex(2).build(),
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(1).getId())
+                                    .orderIndex(0).build(),
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(2).getId())
+                                    .orderIndex(1).build()
+                    ))
+                    .build();
+
+            // when then
+            assertThatThrownBy(() -> playlistService.updateTrackOrders(member, playlistId, playlistOrders))
+                    .isInstanceOf(RestApiException.class);
+        }
     }
 
     @Nested
