@@ -88,12 +88,10 @@ public class PlaylistServiceImpl implements PlaylistService {
         return playlistMapper.toPlaylists(playlistInfos);
     }
 
+    @Transactional
     @Override
     public PlaylistResponse.PlayListId deletePlaylist(Member member, Long playlistId) {
-        Playlist playlist = findPlaylistById(playlistId);
-        if (!playlist.getMember().equals(member)) {
-            throw new RestApiException(PlaylistErrorCode.PLAYLIST_DELETE_FORBIDDEN);
-        }
+        Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
         playlist.delete();
         return playlistMapper.toPlaylistId(playlistId);
     }
@@ -115,10 +113,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Transactional
     @Override
     public PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId, PlaylistRequest.PlaylistEdit playlistEdit) {
-        Playlist playlist = findPlaylistById(playlistId);
-        if (!playlist.getMember().equals(member)) {
-            throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
-        }
+        Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
 
         // 제목 및 이미지 변경
         playlist.updatePlaylist(playlistEdit.getTitle(), playlistEdit.getPlaylistImageUrl());
@@ -130,11 +125,8 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Transactional
     @Override
     public PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, PlaylistRequest.TrackId trackId) {
-        Playlist playlist = findPlaylistById(playlistId);
+        Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
         Track track = findTrackById(trackId.getTrackId());
-        if (!playlist.getMember().equals(member)) {
-            throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
-        }
 
         // TODO: playlist.getPlaylistTracks 로 가져오기 (현재는 playlistTrackRepository.findAllByPlaylistIs(playlist) 로 대체)
         List<PlaylistTrack> playlistTracks = playlistTrackRepository.findAllByPlaylistIs(playlist);
@@ -172,5 +164,13 @@ public class PlaylistServiceImpl implements PlaylistService {
     private Playlist findPlaylistById(Long playlistId) {
         return playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new RestApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
+    }
+
+    private Playlist findPlaylistByIdWithValidation(Long playlistId, Member member) {
+        Playlist playlist = findPlaylistById(playlistId);
+        if (!playlist.getMember().equals(member)) {
+            throw new RestApiException(PlaylistErrorCode.PLAYLIST_UPDATE_FORBIDDEN);
+        }
+        return playlist;
     }
 }
