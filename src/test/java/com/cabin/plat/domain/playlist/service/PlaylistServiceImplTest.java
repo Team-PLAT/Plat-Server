@@ -252,6 +252,33 @@ class PlaylistServiceImplTest {
                 assertThat(pt.getOrderIndex()).isIn(0, 1, 2);
             });
         }
+
+        @Test
+        void 플레이리스트_생성_요청_OrderIndex_순서_잘못됨_예외발생() {
+            // given
+            PlaylistRequest.PlaylistUpload invalidPlaylistUpload = PlaylistUpload.builder()
+                    .title("플레이리스트 제목0")
+                    .playlistImageUrl("https://test0.com")
+                    .tracks(List.of(
+                            TrackOrder.builder()
+                                    .trackId(tracks.get(1).getId())
+                                    .orderIndex(0)
+                                    .build()
+                            ,TrackOrder.builder()
+                                    .trackId(tracks.get(1).getId())
+                                    .orderIndex(1)
+                                    .build()
+                            ,TrackOrder.builder()
+                                    .trackId(tracks.get(2).getId())
+                                    .orderIndex(2)
+                                    .build()
+                    ))
+                    .build();
+
+            // when then
+            assertThatThrownBy(() -> playlistService.addPlaylist(members.get(0), invalidPlaylistUpload))
+                    .isInstanceOf(RestApiException.class);
+        }
     }
 
     @Nested
