@@ -21,6 +21,7 @@ import com.cabin.plat.global.exception.errorCode.PlaylistErrorCode;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         playlistRepository.save(playlist);
 
         List<PlaylistRequest.TrackOrder> trackOrders = playlistUpload.getTracks();
+        validateTrackOrderOrders(trackOrders);
         List<PlaylistTrack> playlistTracks = trackOrders.stream()
                 .map(trackOrder -> {
                     Track track = findTrackById(trackOrder.getTrackId());
@@ -208,6 +210,19 @@ public class PlaylistServiceImpl implements PlaylistService {
     private void validateTrackOrderCount(PlaylistOrders playlistOrders, List<PlaylistTrack> playlistTracks) {
         if (playlistOrders.getTracks().size() != playlistTracks.size()) {
             throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_COUNT_MISMATCH);
+        }
+    }
+
+    private void validateTrackOrderOrders(List<TrackOrder> trackOrders) {
+        List<Integer> orderIndexes = trackOrders.stream()
+                .map(TrackOrder::getOrderIndex)
+                .sorted()
+                .toList();
+
+        for (int i = 0; i < orderIndexes.size(); i++) {
+            if (orderIndexes.get(i) != i) {
+                throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_ORDER_MISMATCH);
+            }
         }
     }
 
