@@ -39,7 +39,7 @@ public class TestServiceImpl implements TestService {
         for (int i = 0; i < 5; i++) {
             TrackUpload trackUpload = TrackUpload.builder()
                     .isrc(randomIsrc())
-                    .imageUrl(randomImageUrl())
+                    .imageUrl(randomMusicImageUrl())
                     .content(randomContent())
                     .latitude(randomLatitude())
                     .longitude(randomLongitude())
@@ -71,7 +71,7 @@ public class TestServiceImpl implements TestService {
 
         for (int playlistCount = 0; playlistCount < 3; playlistCount++) {
             String playlistTitle = "테스트 플레이리스트 " + random.nextInt(1000);
-            String playlistImageUrl = randomImageUrl();
+            String playlistImageUrl = randomMusicImageUrl();
 
             List<PlaylistRequest.TrackOrder> trackOrders = new ArrayList<>();
             for (int i = 0; i < randomTrackSize; i++) {
@@ -87,11 +87,14 @@ public class TestServiceImpl implements TestService {
     // 랜덤 아바타 URL을 생성하는 함수
     private String randomAvatarUrl() {
         List<String> avatarUrlList = List.of(
-                "https://cabin.com/avatar1.jpg",
-                "https://cabin.com/avatar2.jpg",
-                "https://cabin.com/avatar3.jpg",
-                "https://cabin.com/avatar4.jpg",
-                "https://cabin.com/avatar5.jpg"
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_0686_040c9c6b-2a4b-4023-8dea-0c54747cbf80.JPG",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_3440_c52e502d-114b-410e-9638-70986771e7f9.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_4052_14990f80-6483-4d39-a70a-e32a95c52b39.JPG",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_3944_7839dfb3-ec12-4608-af49-5db7f2027dbb.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_4622_17577f43-5d3c-4e23-bc94-f0522a083db1.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_0169_57d40455-fb23-475e-9a35-185a1d6d7f11.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_0265_dc75a732-c569-40e5-a905-ca48d2a21883.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_0950_092b7880-634c-4b39-9d0a-73a2739e0549.PNG"
         );
         return avatarUrlList.get(random.nextInt(avatarUrlList.size()));
     }
@@ -130,13 +133,14 @@ public class TestServiceImpl implements TestService {
     }
 
     // 이미지 URL 목록에서 랜덤으로 선택하는 함수
-    private String randomImageUrl() {
+    private String randomMusicImageUrl() {
         List<String> imageUrlList = List.of(
-                "https://plat-s3-bucket.s3.ap-northeast-2.amazonaws.com/image/D7DA4601-B705-443A-BC4E-3CEDAF652FE7_1_105_c_ef694f21-936b-42eb-b1fc-e2660efd2900.jpeg",
-                "https://plat-s3-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_4620_ffce6548-ee2a-4506-a44d-21b7cae02ef5.jpg",
-                "https://plat-s3-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_4560_b70309c4-db28-4703-9561-3bfa5fe5f142.jpeg",
-                "https://plat-s3-bucket.s3.ap-northeast-2.amazonaws.com/image/B8045AA4-83C4-45CC-9522-8028DAD690FB_4_5005_c_1e4e7a95-ee23-46a9-a9f7-da859a598e2a.jpeg",
-                ""
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_4560_ea692059-ab89-49de-8f96-d5156447f8c3.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_1347_769b0b21-d72d-4f6a-88d7-94b4ddbc65f3.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_4620_bb539093-a545-4009-aee6-8ac957385382.jpg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_1602_caf93149-347c-4779-917d-dd96b7e4e236.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_7175_0e2059ee-00bf-4263-ba98-6acf16882895.jpeg",
+                "https://plat-bucket.s3.ap-northeast-2.amazonaws.com/image/IMG_1761_0249b24f-0efd-4000-aced-d3390bc7ca31.PNG"
         );
         return imageUrlList.get(random.nextInt(imageUrlList.size()));
     }
