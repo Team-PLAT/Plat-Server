@@ -1,6 +1,7 @@
 package com.cabin.plat.domain.track.service;
 
 import com.cabin.plat.domain.member.entity.Member;
+import com.cabin.plat.domain.member.service.MemberService;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;

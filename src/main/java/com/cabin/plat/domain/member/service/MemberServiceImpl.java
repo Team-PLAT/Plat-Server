@@ -116,7 +116,8 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.toMemberId(updateMember.getId());
     }
 
-    private Member findMemberById(Long id) {
+    @Override
+    public Member findMemberById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
