@@ -57,6 +57,9 @@ public class S3FileComponent {
         } catch (AmazonS3Exception e) {
             // S3 업로드 실패 시 에러 코드 분기
             if (isImage) {
+                System.out.println("TEST");
+                System.out.println(e.getMessage());
+                System.out.println(isImage);
                 throw new RestApiException(S3ErrorCode.FAILED_UPLOAD_S3_IMAGE);
             } else {
                 throw new RestApiException(S3ErrorCode.FAILED_UPLOAD_S3_FILE);
