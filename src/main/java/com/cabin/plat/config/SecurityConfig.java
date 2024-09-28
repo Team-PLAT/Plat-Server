@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/address/**").authenticated()
                         .requestMatchers("/playlists/**").authenticated()
                         .requestMatchers("images/**").authenticated()
+                        .requestMatchers("/add-mock-data").authenticated()
                         .anyRequest().denyAll());
 
         http

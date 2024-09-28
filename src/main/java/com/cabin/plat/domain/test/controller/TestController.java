@@ -1,6 +1,10 @@
 package com.cabin.plat.domain.test.controller;
 
+import com.cabin.plat.config.AuthMember;
+import com.cabin.plat.domain.member.entity.Member;
+import com.cabin.plat.domain.test.service.TestService;
 import com.cabin.plat.global.common.BaseResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +16,7 @@ import java.util.TreeMap;
 @RestController
 @RequiredArgsConstructor
 public class TestController {
+    private final TestService testService;
 
     @Value("${server.env}")
     private String env;
@@ -58,5 +63,12 @@ public class TestController {
     private BaseResponse<String> getPlat() {
 
         return BaseResponse.onSuccess("Plat");
+    }
+
+    @PostMapping("/add-mock-data")
+    @Operation(summary = "임시 데이터 추가", description = "사용자 이름과 사진, 트랙 정보와 좋아요, 플레이리스트 정보 모두 랜덤으로 생성된다. 현재 로그인된 유저가 업로드한 정보만 생성되므로 여러 계정으로 로그인 하여 실행하면 더 다양한 데이터가 생성됩니다.")
+    private BaseResponse<String> addMockData(@AuthMember Member member) {
+        testService.addMockData(member);
+        return BaseResponse.onSuccess("Success");
     }
 }
