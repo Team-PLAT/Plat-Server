@@ -201,7 +201,7 @@ class PlaylistServiceImplTest {
     }
 
     @Nested
-    class AddPlaylist {
+    class AddPlaylistTests {
 
         @Test
         void 플레이리스트_테이블_생성_테스트() {
@@ -341,7 +341,7 @@ class PlaylistServiceImplTest {
     }
 
     @Nested
-    class GetSearchedPlaylistsTest {
+    class GetSearchedPlaylistsTests {
 
         @Test
         void 플레이리스트_제목_검색_2개_중에_하나만_검색_성공() {
@@ -489,77 +489,50 @@ class PlaylistServiceImplTest {
 
     @Nested
     class UpdatePlaylistTests {
-//        private PlaylistRequest.PlaylistUpload newPlaylistUpload = PlaylistUpload.builder()
-//                .title("플레이리스트 제목2")
-//                .playlistImageUrl("https://test2.com")
-//                .tracks(List.of(
-//                        TrackOrder.builder()
-//                                .trackId(tracks.get(4).getId())
-//                                .orderIndex(0)
-//                                .build()
-//                        ,TrackOrder.builder()
-//                                .trackId(tracks.get(5).getId())
-//                                .orderIndex(1)
-//                                .build()
-//                ))
-//                .build();
-//
-//        @Test
-//        void 플레이리스트_수정_성공() {
-//            // given
-//            Member member = members.get(0);
-//            Long playlistId = playlistIds.get(0);
-//
-//            // when
-//            playlistService.updatePlaylistTitleAndImage(member, playlistId, newPlaylistUpload);
-//            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
-//
-//            // then
-//            assertThat(optionalPlaylist.isPresent()).isTrue();
-//            Playlist playlist = optionalPlaylist.get();
-//
-//            // 변경된 정보
-//            assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목2");
-//            assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test2.com");
-//            assertThat(playlist.getPlaylistTracks().get(0).getId()).isEqualTo(tracks.get(4).getId());
-//            assertThat(playlist.getPlaylistTracks().get(0).getOrderIndex()).isEqualTo(0);
-//            assertThat(playlist.getPlaylistTracks().get(1).getId()).isEqualTo(tracks.get(5).getId());
-//            assertThat(playlist.getPlaylistTracks().get(1).getOrderIndex()).isEqualTo(1);
-//        }
-//
-//        @Test
-//        void 플레이리스트_수정_실패_권한없음() {
-//            // given
-//            Member member = members.get(2);
-//            Long playlistId = playlistIds.get(0);
-//
-//            // when
-//            playlistService.updatePlaylistTitleAndImage(member, playlistId, newPlaylistUpload);
-//            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
-//
-//            // then
-//            assertThat(optionalPlaylist.isPresent()).isTrue();
-//            Playlist playlist = optionalPlaylist.get();
-//
-//            // 변경안된 정보
-//            assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목0");
-//            assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test0.com");
-//            assertThat(playlist.getPlaylistTracks().get(0).getId()).isEqualTo(tracks.get(0).getId());
-//            assertThat(playlist.getPlaylistTracks().get(0).getOrderIndex()).isEqualTo(0);
-//            assertThat(playlist.getPlaylistTracks().get(1).getId()).isEqualTo(tracks.get(1).getId());
-//            assertThat(playlist.getPlaylistTracks().get(1).getOrderIndex()).isEqualTo(1);
-//        }
-//
-//        @Test
-//        void 플레이리스트_수정_실패_권한없음_예외발생() {
-//            // given
-//            Member member = members.get(2);
-//            Long playlistId = playlistIds.get(0);
-//
-//            // when then
-//            assertThatThrownBy(() -> playlistService.updatePlaylistTitleAndImage(member, playlistId, newPlaylistUpload))
-//                    .isInstanceOf(RestApiException.class);
-//        }
+
+        private PlaylistRequest.PlaylistEdit playlistEdit = PlaylistRequest.PlaylistEdit.builder()
+                .title("플레이리스트 제목2")
+                .playlistImageUrl("https://test2.com")
+                .build();
+
+        @Test
+        void 플레이리스트_수정_성공() {
+            // given
+            Member member = members.get(0);
+            Long playlistId = playlistIds.get(0);
+
+            // when
+            playlistService.updatePlaylistTitleAndImage(member, playlistId, playlistEdit);
+            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+
+            // then
+            assertThat(optionalPlaylist.isPresent()).isTrue();
+            Playlist playlist = optionalPlaylist.get();
+
+            // 변경된 정보
+            assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목2");
+            assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test2.com");
+        }
+
+        @Test
+        void 플레이리스트_수정_실패_권한없음_예외발생() {
+            // given
+            Member member = members.get(2);
+            Long playlistId = playlistIds.get(0);
+
+            // when then
+            assertThatThrownBy(() -> playlistService.updatePlaylistTitleAndImage(member, playlistId, playlistEdit))
+                    .isInstanceOf(RestApiException.class);
+
+            Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+
+            // then
+            assertThat(optionalPlaylist.isPresent()).isTrue();
+            Playlist playlist = optionalPlaylist.get();
+
+            assertThat(playlist.getTitle()).isEqualTo("플레이리스트 제목0");
+            assertThat(playlist.getPlaylistImageUrl()).isEqualTo("https://test0.com");
+        }
     }
 
     @Nested
