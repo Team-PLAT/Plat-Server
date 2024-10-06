@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.cabin.plat.domain.member.entity.*;
 import com.cabin.plat.domain.member.repository.MemberRepository;
+import com.cabin.plat.domain.member.service.MemberService;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.TrackOrder;
@@ -17,6 +18,7 @@ import com.cabin.plat.domain.track.entity.Location;
 import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.repository.LocationRepository;
 import com.cabin.plat.domain.track.repository.TrackRepository;
+import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.exception.RestApiException;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -31,6 +33,12 @@ class PlaylistServiceImplTest {
 
     @Autowired
     private PlaylistService playlistService;
+
+    @Autowired
+    private TrackService trackService;
+
+    @Autowired
+    private MemberService memberService;
 
     @Autowired
     private PlaylistRepository playlistRepository;
@@ -338,6 +346,44 @@ class PlaylistServiceImplTest {
             // then
             assertThat(playlists.getPlaylists()).isEmpty();
         }
+
+        @Test
+        void 회원_탈퇴한_멤버의_트랙이_포함된_플레이리스트_조회시_uploaderNickname_닉네임_알수없음으로_가져오기() {
+            // given
+            Member member0 = members.get(0);
+            Member member1 = members.get(1);
+            memberService.resign(member1); // 멤버 1이 탈퇴 해서 멤버 1이 업로드한 트랙2가 삭제 (트랙2는 멤버0이 만든 플레이리스트0에 포함)
+
+            // when
+            PlaylistResponse.Playlists playlists0 = playlistService.getPlaylists(member0, 0, 20);
+
+            // then
+            String title = playlists0.getPlaylists().get(0).getTitle();
+            String imageUrl = playlists0.getPlaylists().get(0).getPlaylistImageUrl();
+            Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
+            assertThat(title).isEqualTo("플레이리스트 제목0");
+            assertThat(imageUrl).isEqualTo("https://test0.com");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+        }
+
+        @Test
+        void 삭제된_트랙이_포함된_플레이리스트_조회시_삭제된_트랙은_uploaderNickname_닉네임_알수없음으로_가져오기() {
+            // given
+            Member member0 = members.get(0);
+            Member member1 = members.get(1);
+            trackService.deleteTrack(member1, tracks.get(2).getId()); // 멤버 1이 업로드한 트랙2 삭제 (트랙2는 멤버0이 만든 플레이리스트0에 포함)
+
+            // when
+            PlaylistResponse.Playlists playlists0 = playlistService.getPlaylists(member0, 0, 20);
+
+            // then
+            String title = playlists0.getPlaylists().get(0).getTitle();
+            String imageUrl = playlists0.getPlaylists().get(0).getPlaylistImageUrl();
+            Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
+            assertThat(title).isEqualTo("플레이리스트 제목0");
+            assertThat(imageUrl).isEqualTo("https://test0.com");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+        }
     }
 
     @Nested
@@ -407,6 +453,44 @@ class PlaylistServiceImplTest {
             // then
             assertThat(playlists.getPlaylists()).isEmpty();
         }
+
+        @Test
+        void 회원_탈퇴한_멤버의_트랙이_포함된_플레이리스트_조회시_uploaderNickname_닉네임_알수없음으로_가져오기() {
+            // given
+            Member member0 = members.get(0);
+            Member member1 = members.get(1);
+            memberService.resign(member1); // 멤버 1이 탈퇴 해서 멤버 1이 업로드한 트랙2가 삭제 (트랙2는 멤버0이 만든 플레이리스트0에 포함)
+
+            // when
+            PlaylistResponse.Playlists playlists0 = playlistService.getSearchedPlaylists(member0, "플레이리스트", 0, 20);
+
+            // then
+            String title = playlists0.getPlaylists().get(0).getTitle();
+            String imageUrl = playlists0.getPlaylists().get(0).getPlaylistImageUrl();
+            Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
+            assertThat(title).isEqualTo("플레이리스트 제목0");
+            assertThat(imageUrl).isEqualTo("https://test0.com");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+        }
+
+        @Test
+        void 삭제된_트랙이_포함된_플레이리스트_조회시_삭제된_트랙은_uploaderNickname_닉네임_알수없음으로_가져오기() {
+            // given
+            Member member0 = members.get(0);
+            Member member1 = members.get(1);
+            trackService.deleteTrack(member1, tracks.get(2).getId()); // 멤버 1이 업로드한 트랙2 삭제 (트랙2는 멤버0이 만든 플레이리스트0에 포함)
+
+            // when
+            PlaylistResponse.Playlists playlists0 = playlistService.getSearchedPlaylists(member0, "플레이리스트", 0, 20);
+
+            // then
+            String title = playlists0.getPlaylists().get(0).getTitle();
+            String imageUrl = playlists0.getPlaylists().get(0).getPlaylistImageUrl();
+            Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
+            assertThat(title).isEqualTo("플레이리스트 제목0");
+            assertThat(imageUrl).isEqualTo("https://test0.com");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+        }
     }
 
     @Nested
@@ -471,6 +555,18 @@ class PlaylistServiceImplTest {
             // then
 
             assertPlaylistTrackDetails(playlistDetail);
+        }
+
+        @Test
+        void 회원_탈퇴한_멤버의_트랙이_포함된_플레이리스트_디테일_조회시_노래정보_제외하고_삭제처리() {
+            // given
+            Member member = members.get(0);
+
+            // when
+            memberService.resign(member);
+
+            // then
+//            TrackDetail_안의_imageUrl_content_likeCount_isLiked_memberNickname_avatar_삭제처리
         }
 
         private void assertPlaylistTrackDetails(PlaylistResponse.PlaylistDetail playlistDetail) {
