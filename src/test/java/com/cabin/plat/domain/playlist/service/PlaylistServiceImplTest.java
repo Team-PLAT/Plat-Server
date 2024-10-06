@@ -14,6 +14,7 @@ import com.cabin.plat.domain.playlist.entity.Playlist;
 import com.cabin.plat.domain.playlist.entity.PlaylistTrack;
 import com.cabin.plat.domain.playlist.repository.PlaylistRepository;
 import com.cabin.plat.domain.playlist.repository.PlaylistTrackRepository;
+import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import com.cabin.plat.domain.track.entity.Location;
 import com.cabin.plat.domain.track.entity.Track;
 import com.cabin.plat.domain.track.repository.LocationRepository;
@@ -553,20 +554,56 @@ class PlaylistServiceImplTest {
             PlaylistResponse.PlaylistDetail playlistDetail = playlistService.getPlaylistDetail(member, playlistId);
 
             // then
-
             assertPlaylistTrackDetails(playlistDetail);
         }
 
         @Test
-        void 회원_탈퇴한_멤버의_트랙이_포함된_플레이리스트_디테일_조회시_노래정보_제외하고_삭제처리() {
+        void 회원_탈퇴한_멤버의_트랙이_포함된_플레이리스트_디테일_조회시_노래정보_제외_나머지_삭제처리() {
             // given
-            Member member = members.get(0);
+            Member member0 = members.get(0);
+            Member member1 = members.get(1);
+            Long playlist0Id = playlistIds.get(0);
+            TrackDetail trackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2).getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
+            assertThat(trackDetail.getIsrc()).isEqualTo("isrc3");
+            assertThat(trackDetail.getContent()).isEqualTo("아카데미는 이 노래지");
+            assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage3.com");
+            assertThat(trackDetail.getMember().getMemberNickname()).isEqualTo("닉네임2");
+            assertThat(trackDetail.getMember().getAvatar()).isEqualTo("https://testimage3.avatar/");
+
+            memberService.resign(member1);
 
             // when
-            memberService.resign(member);
+            TrackDetail newTrackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2).getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
 
             // then
-//            TrackDetail_안의_imageUrl_content_likeCount_isLiked_memberNickname_avatar_삭제처리
+            assertThat(newTrackDetail.getIsrc()).isEqualTo("isrc3");
+            assertThat(newTrackDetail.getLikeCount()).isEqualTo(0);
+            assertThat(newTrackDetail.getIsLiked()).isFalse();
+            assertThat(newTrackDetail.getContent()).isNotEqualTo("아카데미는 이 노래지");
+            assertThat(newTrackDetail.getImageUrl()).isEqualTo("");
+            assertThat(newTrackDetail.getMember().getMemberNickname()).isEqualTo("알수없음");
+            assertThat(newTrackDetail.getMember().getAvatar()).isEqualTo("");
+        }
+
+        @Test
+        void 삭제한_트랙이_포함된_플레이리스트_디테일_조회시_노래정보_제외_나머지_삭제처리() {
+            // given
+            Member member0 = members.get(0);
+            Member member1 = members.get(1);
+            Long playlist0Id = playlistIds.get(0);
+
+            // when
+            trackService.deleteTrack(member1, tracks.get(2).getId());
+            TrackDetail newTrackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2).getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
+
+            // then
+            assertThat(newTrackDetail.getIsrc()).isEqualTo("isrc3");
+            assertThat(newTrackDetail.getLikeCount()).isEqualTo(0);
+            assertThat(newTrackDetail.getIsLiked()).isFalse();
+            assertThat(newTrackDetail.getContent()).isNotEqualTo("아카데미는 이 노래지");
+            assertThat(newTrackDetail.getImageUrl()).isEqualTo("");
+            assertThat(newTrackDetail.getMember().getMemberNickname()).isEqualTo("알수없음");
+            assertThat(newTrackDetail.getMember().getAvatar()).isEqualTo("");
         }
 
         private void assertPlaylistTrackDetails(PlaylistResponse.PlaylistDetail playlistDetail) {
