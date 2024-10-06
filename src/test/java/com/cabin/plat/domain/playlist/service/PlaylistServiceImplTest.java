@@ -600,7 +600,7 @@ class PlaylistServiceImplTest {
             assertThat(newTrackDetail.getIsrc()).isEqualTo("isrc3");
             assertThat(newTrackDetail.getLikeCount()).isEqualTo(0);
             assertThat(newTrackDetail.getIsLiked()).isFalse();
-            assertThat(newTrackDetail.getContent()).isNotEqualTo("아카데미는 이 노래지");
+            assertThat(newTrackDetail.getContent()).isEqualTo("삭제된 게시글 입니다");
             assertThat(newTrackDetail.getImageUrl()).isEqualTo("");
             assertThat(newTrackDetail.getMember().getMemberNickname()).isEqualTo("알수없음");
             assertThat(newTrackDetail.getMember().getAvatar()).isEqualTo("");

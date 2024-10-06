@@ -153,31 +153,35 @@ class TrackServiceTest {
                 .ignoringFields("trackId").isEqualTo(expectedTrackMap2);
     }
 
-    @Test
-    void getTrackByIdTest() {
-        // given
-        Long trackId = tracks.get(0).getId();
-        TrackResponse.MemberInfo memberInfo = TrackResponse.MemberInfo.builder()
-                .memberId(members.get(0).getId())
-                .memberNickname(members.get(0).getNickname())
-                .avatar(members.get(0).getAvatar())
-                .build();
+    @Nested
+    class getTrackByIdTests {
 
-        // when
-        TrackResponse.TrackDetail trackDetail = trackService.getTrackById(members.get(0), trackId);
+        @Test
+        void 트랙_조회_성공() {
+            // given
+            Long trackId = tracks.get(0).getId();
+            TrackResponse.MemberInfo memberInfo = TrackResponse.MemberInfo.builder()
+                    .memberId(members.get(0).getId())
+                    .memberNickname(members.get(0).getNickname())
+                    .avatar(members.get(0).getAvatar())
+                    .build();
 
-        // then
-        assertThat(trackDetail).isNotNull();
-        assertThat(trackDetail.getIsrc()).isEqualTo("isrc1");
-        assertThat(trackDetail.getLatitude()).isEqualTo(36.017062);
-        assertThat(trackDetail.getLongitude()).isEqualTo(129.321993);
-        assertThat(trackDetail.getBuildingName()).isEqualTo("Dormitory 16 (DICE)");
-        assertThat(trackDetail.getAddress()).isEqualTo("경상북도 포항시 남구 지곡동 287");
-        assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage1.com");
-        assertThat(trackDetail.getContent()).isEqualTo("기숙사에서 한곡");
-        assertThat(trackDetail.getLikeCount()).isEqualTo(0);
-        assertThat(trackDetail.getIsLiked()).isEqualTo(false);
-        assertThat(trackDetail.getMember()).usingRecursiveComparison().isEqualTo(memberInfo);
+            // when
+            TrackResponse.TrackDetail trackDetail = trackService.getTrackById(members.get(0), trackId);
+
+            // then
+            assertThat(trackDetail).isNotNull();
+            assertThat(trackDetail.getIsrc()).isEqualTo("isrc1");
+            assertThat(trackDetail.getLatitude()).isEqualTo(36.017062);
+            assertThat(trackDetail.getLongitude()).isEqualTo(129.321993);
+            assertThat(trackDetail.getBuildingName()).isEqualTo("Dormitory 16 (DICE)");
+            assertThat(trackDetail.getAddress()).isEqualTo("경상북도 포항시 남구 지곡동 287");
+            assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage1.com");
+            assertThat(trackDetail.getContent()).isEqualTo("기숙사에서 한곡");
+            assertThat(trackDetail.getLikeCount()).isEqualTo(0);
+            assertThat(trackDetail.getIsLiked()).isEqualTo(false);
+            assertThat(trackDetail.getMember()).usingRecursiveComparison().isEqualTo(memberInfo);
+        }
     }
 
     @Nested
@@ -303,6 +307,7 @@ class TrackServiceTest {
 
     @Nested
     class DeleteTrackTest {
+
         @Test
         void 트랙_삭제_성공() {
             // given
@@ -328,6 +333,29 @@ class TrackServiceTest {
             // when, then
             assertThatThrownBy(() -> trackService.deleteTrack(nonUploader, trackId))
                     .isInstanceOf(RestApiException.class);
+        }
+
+        @Test
+        void 트랙_삭제시_노래_제외_정보들_삭제처리() {
+            // given
+            Member uploader = members.get(0);
+            Long trackId = tracks.get(0).getId();
+
+            // when
+            TrackResponse.TrackId deletedTrackId = trackService.deleteTrack(uploader, trackId);
+
+            // then
+            trackRepository.findById(deletedTrackId.getTrackId()).ifPresent(track ->
+                    assertThat(track.getDeletedAt()).isNotNull() // deletedAt 값이 null 이 아님
+            );
+            TrackDetail trackDetail = trackService.getTrackById(uploader, deletedTrackId.getTrackId());
+            assertThat(trackDetail.getIsrc()).isEqualTo("isrc1");
+            assertThat(trackDetail.getLikeCount()).isEqualTo(0); // 모든 좋아요 삭제
+            assertThat(trackDetail.getIsLiked()).isFalse(); // 모든 좋아요 삭제
+            assertThat(trackDetail.getContent()).isEqualTo("삭제된 게시글 입니다"); // 본문 "삭제된 게시글 입니다"
+            assertThat(trackDetail.getImageUrl()).isEqualTo(""); // 트랙 이미지 ""
+            assertThat(trackDetail.getMember().getMemberNickname()).isEqualTo("알수없음"); // 업로드한 멤버 이름 "알수없음"
+            assertThat(trackDetail.getMember().getAvatar()).isEqualTo(""); // 업로드한 멤버 아바타 ""
         }
     }
 
