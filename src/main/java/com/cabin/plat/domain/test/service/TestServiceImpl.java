@@ -167,7 +167,7 @@ public class TestServiceImpl implements TestService {
 
     private double randomLongitude() {
         double minLongitude = 129.322000;
-        double maxLongitude = 129.340000;
+        double maxLongitude = 129.346000;
         return minLongitude + (maxLongitude - minLongitude) * random.nextDouble();
     }
 }
