@@ -19,9 +19,13 @@ import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.PlaylistErrorCode;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -101,6 +105,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Override
     public PlaylistResponse.PlayListId deletePlaylist(Member member, Long playlistId) {
         Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
+        playlistTrackRepository.findAllByPlaylistIs(playlist).forEach(PlaylistTrack::delete);
         playlist.delete();
         return playlistMapper.toPlaylistId(playlistId);
     }
@@ -113,7 +118,8 @@ public class PlaylistServiceImpl implements PlaylistService {
                 playlist);
         List<PlaylistResponse.TrackDetailOrder> trackDetailOrders = playlistTracks.stream()
                 .map(playlistTrack -> {
-                    TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member, playlistTrack.getTrack().getId());
+                    TrackResponse.TrackDetail trackDetail = trackService.getTrackById(member,
+                            playlistTrack.getTrack().getId());
                     return playlistMapper.toTrackDetailOrder(playlistTrack, trackDetail);
                 })
                 .sorted(Comparator.comparingInt(PlaylistResponse.TrackDetailOrder::getOrderIndex))
@@ -123,7 +129,8 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Transactional
     @Override
-    public PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId, PlaylistRequest.PlaylistEdit playlistEdit) {
+    public PlaylistResponse.PlayListId updatePlaylistTitleAndImage(Member member, Long playlistId,
+                                                                   PlaylistRequest.PlaylistEdit playlistEdit) {
         Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
 
         // 제목 및 이미지 변경
@@ -134,7 +141,8 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Transactional
     @Override
-    public PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId, PlaylistRequest.TrackId trackId) {
+    public PlaylistResponse.PlayListId addTrackToPlaylist(Member member, Long playlistId,
+                                                          PlaylistRequest.TrackId trackId) {
         Playlist playlist = findPlaylistByIdWithValidation(playlistId, member);
         Track track = findTrackById(trackId.getTrackId());
 
@@ -169,7 +177,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         validateTrackOrderCount(playlistOrders, playlistTracks);
         validateTrackIds(playlistOrders, playlistTracks);
 
-        for (PlaylistTrack playlistTrack: playlistTracks) {
+        for (PlaylistTrack playlistTrack : playlistTracks) {
             Long trackId = playlistTrack.getTrack().getId();
             int newOrder = trackOrderMap.get(trackId);
             playlistTrack.setOrderIndex(newOrder);
@@ -202,7 +210,8 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     private static void validateTrackDuplicateInPlaylist(TrackId trackId, List<PlaylistTrack> playlistTracks) {
-        if (playlistTracks.stream().anyMatch(playlistTrack -> playlistTrack.getTrack().getId().equals(trackId.getTrackId()))) {
+        if (playlistTracks.stream()
+                .anyMatch(playlistTrack -> playlistTrack.getTrack().getId().equals(trackId.getTrackId()))) {
             throw new RestApiException(PlaylistErrorCode.PLAYLIST_TRACK_DUPLICATE);
         }
     }

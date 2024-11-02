@@ -1,6 +1,5 @@
 package com.cabin.plat.domain.playlist.mapper;
 
-import com.cabin.plat.domain.member.dto.MemberResponse;
 import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest.PlaylistUpload;
 import com.cabin.plat.domain.playlist.dto.PlaylistResponse;
@@ -52,7 +51,8 @@ public class PlaylistMapper {
                 .build();
     }
 
-    public PlaylistResponse.Playlists.PlaylistInfo toPlaylistInfo(Playlist playlist, List<PlaylistTrack> playlistTracks) {
+    public PlaylistResponse.Playlists.PlaylistInfo toPlaylistInfo(Playlist playlist,
+                                                                  List<PlaylistTrack> playlistTracks) {
         return PlaylistInfo.builder()
                 .playlistId(playlist.getId())
                 .title(playlist.getTitle())
@@ -60,19 +60,26 @@ public class PlaylistMapper {
                 .createdAt(playlist.getCreatedAt())
                 .uploaderNicknames(playlistTracks.stream()
                         .map(PlaylistTrack::getTrack)
-                        .map(track -> track.getMember().getNickname())
+                        .map(track -> {
+                            if (track.getMember() == null) {
+                                return "알수없음";
+                            }
+                            return track.getMember().getNickname();
+                        })
                         .collect(Collectors.toUnmodifiableSet()))
                 .build();
     }
 
-    public PlaylistResponse.TrackDetailOrder toTrackDetailOrder(PlaylistTrack playlistTrack, TrackResponse.TrackDetail trackDetail) {
+    public PlaylistResponse.TrackDetailOrder toTrackDetailOrder(PlaylistTrack playlistTrack,
+                                                                TrackResponse.TrackDetail trackDetail) {
         return PlaylistResponse.TrackDetailOrder.builder()
                 .orderIndex(playlistTrack.getOrderIndex())
                 .trackDetail(trackDetail)
                 .build();
     }
 
-    public PlaylistResponse.PlaylistDetail toPlaylistDetail(Playlist playlist, List<TrackDetailOrder> trackDetailOrders) {
+    public PlaylistResponse.PlaylistDetail toPlaylistDetail(Playlist playlist,
+                                                            List<TrackDetailOrder> trackDetailOrders) {
         return PlaylistResponse.PlaylistDetail.builder()
                 .playlistId(playlist.getId())
                 .title(playlist.getTitle())

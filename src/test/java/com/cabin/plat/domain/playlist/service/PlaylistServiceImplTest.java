@@ -1,8 +1,12 @@
 package com.cabin.plat.domain.playlist.service;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.cabin.plat.domain.member.entity.*;
+import com.cabin.plat.domain.member.entity.Member;
+import com.cabin.plat.domain.member.entity.PermissionRole;
+import com.cabin.plat.domain.member.entity.SocialType;
+import com.cabin.plat.domain.member.entity.StreamType;
 import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.member.service.MemberService;
 import com.cabin.plat.domain.playlist.dto.PlaylistRequest;
@@ -21,11 +25,20 @@ import com.cabin.plat.domain.track.repository.LocationRepository;
 import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.domain.track.service.TrackService;
 import com.cabin.plat.global.exception.RestApiException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -73,9 +86,12 @@ class PlaylistServiceImplTest {
     private List<Member> createTestMembers() {
         List<Member> members = new ArrayList<>();
 
-        Member member1 = new Member(null, PermissionRole.CLIENT, "1", "이름1", "이메일1", "닉네임1", "https://testimage1.avatar/", StreamType.APPLE_MUSIC, SocialType.APPLE);
-        Member member2 = new Member(null, PermissionRole.CLIENT, "2", "이름2", "이메일2", "닉네임2", "https://testimage2.avatar/", StreamType.SPOTIFY, SocialType.APPLE);
-        Member member3 = new Member(null, PermissionRole.CLIENT, "3", "이름3", "이메일3", "닉네임3", "https://testimage3.avatar/", StreamType.APPLE_MUSIC, SocialType.APPLE);
+        Member member1 = new Member(null, PermissionRole.CLIENT, "1", "이름1", "이메일1", "닉네임1",
+                "https://testimage1.avatar/", StreamType.APPLE_MUSIC, SocialType.APPLE);
+        Member member2 = new Member(null, PermissionRole.CLIENT, "2", "이름2", "이메일2", "닉네임2",
+                "https://testimage2.avatar/", StreamType.SPOTIFY, SocialType.APPLE);
+        Member member3 = new Member(null, PermissionRole.CLIENT, "3", "이름3", "이메일3", "닉네임3",
+                "https://testimage3.avatar/", StreamType.APPLE_MUSIC, SocialType.APPLE);
 
         members.add(memberRepository.save(member1));
         members.add(memberRepository.save(member2));
@@ -89,7 +105,8 @@ class PlaylistServiceImplTest {
 
         Location domitory18 = new Location(null, "Dormitory 16 (DICE)", "경상북도 포항시 남구 지곡동 287", 36.017062, 129.321993);
         Location burgerKing = new Location(null, "버거킹 포항공대점", "경상북도 포항시 남구 청암로 77", 36.015733, 129.322700);
-        Location c5 = new Location(null, "Apple Developer Academy @ POSTECH(애플 디벨로퍼 아카데미)", "경상북도 포항시 남구 청암로 77", 36.014335, 129.325951);
+        Location c5 = new Location(null, "Apple Developer Academy @ POSTECH(애플 디벨로퍼 아카데미)", "경상북도 포항시 남구 청암로 77",
+                36.014335, 129.325951);
         Location liversAcademy = new Location(null, "", "경상북도 포항시 남구 효자동 222-24", 36.009002, 129.332852);
         Location young1Dae = new Location(null, "영일대 해수욕장", "경상북도 포항시 북구 두호동 1015", 36.056074, 129.378190);
         Location hwangLidanGil = new Location(null, "황리단길", "경상북도 경주시 황남동 포석로 일대", 35.837555, 129.209712);
@@ -107,11 +124,16 @@ class PlaylistServiceImplTest {
     private List<Track> createTestTracks(List<Member> members, List<Location> locations) {
         List<Track> tracks = new ArrayList<>();
         Track track0 = new Track(null, members.get(0), locations.get(0), "isrc1", "기숙사에서 한곡", "https://testimage1.com");
-        Track track1 = new Track(null, members.get(0), locations.get(1), "isrc2", "버거킹마을 공연 최애 노래", "https://testimage2.com");
-        Track track2 = new Track(null, members.get(1), locations.get(2), "isrc3", "아카데미는 이 노래지", "https://testimage3.com");
-        Track track3 = new Track(null, members.get(1), locations.get(3), "isrc4", "리버스아카데미 노래", "https://testimage4.com");
-        Track track4 = new Track(null, members.get(2), locations.get(4), "isrc5", "영일대는 이노래지", "https://testimage5.com");
-        Track track5 = new Track(null, members.get(2), locations.get(5), "isrc6", "황리단길과 어울리는", "https://testimage5.com");
+        Track track1 = new Track(null, members.get(0), locations.get(1), "isrc2", "버거킹마을 공연 최애 노래",
+                "https://testimage2.com");
+        Track track2 = new Track(null, members.get(1), locations.get(2), "isrc3", "아카데미는 이 노래지",
+                "https://testimage3.com");
+        Track track3 = new Track(null, members.get(1), locations.get(3), "isrc4", "리버스아카데미 노래",
+                "https://testimage4.com");
+        Track track4 = new Track(null, members.get(2), locations.get(4), "isrc5", "영일대는 이노래지",
+                "https://testimage5.com");
+        Track track5 = new Track(null, members.get(2), locations.get(5), "isrc6", "황리단길과 어울리는",
+                "https://testimage5.com");
 
         tracks.add(trackRepository.save(track0));
         tracks.add(trackRepository.save(track1));
@@ -131,11 +153,11 @@ class PlaylistServiceImplTest {
                                 .trackId(tracks.get(0).getId())
                                 .orderIndex(0)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(1).getId())
                                 .orderIndex(1)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(2).getId())
                                 .orderIndex(2)
                                 .build()
@@ -150,11 +172,11 @@ class PlaylistServiceImplTest {
                                 .trackId(tracks.get(3).getId())
                                 .orderIndex(0)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(4).getId())
                                 .orderIndex(1)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(5).getId())
                                 .orderIndex(2)
                                 .build()
@@ -169,23 +191,23 @@ class PlaylistServiceImplTest {
                                 .trackId(tracks.get(0).getId())
                                 .orderIndex(0)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(1).getId())
                                 .orderIndex(1)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(2).getId())
                                 .orderIndex(2)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(3).getId())
                                 .orderIndex(3)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(4).getId())
                                 .orderIndex(4)
                                 .build()
-                        ,TrackOrder.builder()
+                        , TrackOrder.builder()
                                 .trackId(tracks.get(5).getId())
                                 .orderIndex(5)
                                 .build()
@@ -271,11 +293,11 @@ class PlaylistServiceImplTest {
                                     .trackId(tracks.get(0).getId())
                                     .orderIndex(0)
                                     .build()
-                            ,TrackOrder.builder()
+                            , TrackOrder.builder()
                                     .trackId(tracks.get(1).getId())
                                     .orderIndex(1)
                                     .build()
-                            ,TrackOrder.builder()
+                            , TrackOrder.builder()
                                     .trackId(tracks.get(2).getId())
                                     .orderIndex(1)
                                     .build()
@@ -364,7 +386,7 @@ class PlaylistServiceImplTest {
             Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
             assertThat(title).isEqualTo("플레이리스트 제목0");
             assertThat(imageUrl).isEqualTo("https://test0.com");
-            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder(member0.getNickname(), "알수없음");
         }
 
         @Test
@@ -383,7 +405,24 @@ class PlaylistServiceImplTest {
             Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
             assertThat(title).isEqualTo("플레이리스트 제목0");
             assertThat(imageUrl).isEqualTo("https://test0.com");
-            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder(member0.getNickname(), "알수없음");
+        }
+
+        @Test
+        void 회원_탈퇴시_해당_회원이_올린_플레이리스트_모두_소프트_삭제() {
+            // given
+            Member member = members.get(0);
+            List<Sort.Order> sorts = new ArrayList<>();
+            sorts.add(Sort.Order.desc("createdAt"));
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(sorts));
+
+            // when
+            memberService.resign(member);
+
+            // then
+            playlistRepository.findAllByMember(member, pageable).forEach(playlist -> {
+                assertThat(playlist.getDeletedAt()).isNotNull();
+            });
         }
     }
 
@@ -471,7 +510,7 @@ class PlaylistServiceImplTest {
             Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
             assertThat(title).isEqualTo("플레이리스트 제목0");
             assertThat(imageUrl).isEqualTo("https://test0.com");
-            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder(member0.getNickname(), "알수없음");
         }
 
         @Test
@@ -490,7 +529,7 @@ class PlaylistServiceImplTest {
             Set<String> uploaderNicknames = playlists0.getPlaylists().get(0).getUploaderNicknames();
             assertThat(title).isEqualTo("플레이리스트 제목0");
             assertThat(imageUrl).isEqualTo("https://test0.com");
-            assertThat(uploaderNicknames).containsExactlyInAnyOrder("닉네임0", "알수없음");
+            assertThat(uploaderNicknames).containsExactlyInAnyOrder(member0.getNickname(), "알수없음");
         }
     }
 
@@ -563,26 +602,26 @@ class PlaylistServiceImplTest {
             Member member0 = members.get(0);
             Member member1 = members.get(1);
             Long playlist0Id = playlistIds.get(0);
-            TrackDetail trackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2).getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
-            assertThat(trackDetail.getIsrc()).isEqualTo("isrc3");
-            assertThat(trackDetail.getContent()).isEqualTo("아카데미는 이 노래지");
-            assertThat(trackDetail.getImageUrl()).isEqualTo("https://testimage3.com");
-            assertThat(trackDetail.getMember().getMemberNickname()).isEqualTo("닉네임2");
-            assertThat(trackDetail.getMember().getAvatar()).isEqualTo("https://testimage3.avatar/");
-
             memberService.resign(member1);
 
             // when
-            TrackDetail newTrackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2).getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
+            TrackDetail trackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2)
+                    .getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
 
             // then
-            assertThat(newTrackDetail.getIsrc()).isEqualTo("isrc3");
-            assertThat(newTrackDetail.getLikeCount()).isEqualTo(0);
-            assertThat(newTrackDetail.getIsLiked()).isFalse();
-            assertThat(newTrackDetail.getContent()).isNotEqualTo("아카데미는 이 노래지");
-            assertThat(newTrackDetail.getImageUrl()).isEqualTo("");
-            assertThat(newTrackDetail.getMember().getMemberNickname()).isEqualTo("알수없음");
-            assertThat(newTrackDetail.getMember().getAvatar()).isEqualTo("");
+            assertThat(trackDetail.getTrackId()).isNotNull();
+            assertThat(trackDetail.getIsrc()).isNotBlank();
+            assertThat(trackDetail.getCreatedAt()).isNotNull();
+            assertThat(trackDetail.getLatitude()).isZero();
+            assertThat(trackDetail.getLongitude()).isZero();
+            assertThat(trackDetail.getBuildingName()).isBlank();
+            assertThat(trackDetail.getAddress()).isBlank();
+            assertThat(trackDetail.getImageUrl()).isEqualTo("");
+            assertThat(trackDetail.getContent()).isEqualTo("삭제된 게시글 입니다");
+            assertThat(trackDetail.getLikeCount()).isZero();
+            assertThat(trackDetail.getIsLiked()).isFalse();
+            assertThat(trackDetail.getMember().getMemberNickname()).isEqualTo("알수없음");
+            assertThat(trackDetail.getMember().getAvatar()).isEqualTo("");
         }
 
         @Test
@@ -594,7 +633,8 @@ class PlaylistServiceImplTest {
 
             // when
             trackService.deleteTrack(member1, tracks.get(2).getId());
-            TrackDetail newTrackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2).getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
+            TrackDetail newTrackDetail = playlistService.getPlaylistDetail(member0, playlist0Id).getTracks().get(2)
+                    .getTrackDetail(); // 탈퇴한 멤버가 업로드한 트랙
 
             // then
             assertThat(newTrackDetail.getIsrc()).isEqualTo("isrc3");
@@ -859,7 +899,8 @@ class PlaylistServiceImplTest {
             Long deleteTrackId = tracks.get(1).getId();
 
             // when
-            PlaylistResponse.PlayListId responsePlaylistId = playlistService.deleteTrackFromPlaylist(member, playlistId, deleteTrackId);
+            PlaylistResponse.PlayListId responsePlaylistId = playlistService.deleteTrackFromPlaylist(member, playlistId,
+                    deleteTrackId);
 
             // then
             assertThat(responsePlaylistId.getPlaylistId()).isEqualTo(playlistId);
@@ -879,7 +920,8 @@ class PlaylistServiceImplTest {
             Long deleteTrackId = tracks.get(1).getId();
 
             // when
-            PlaylistResponse.PlayListId responsePlaylistId = playlistService.deleteTrackFromPlaylist(member, playlistId, deleteTrackId);
+            PlaylistResponse.PlayListId responsePlaylistId = playlistService.deleteTrackFromPlaylist(member, playlistId,
+                    deleteTrackId);
 
             // then
             Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);

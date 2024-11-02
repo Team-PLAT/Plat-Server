@@ -1,14 +1,19 @@
 package com.cabin.plat.domain.track.service;
 
 import com.cabin.plat.domain.member.entity.Member;
-import com.cabin.plat.domain.member.service.MemberService;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackId;
-import com.cabin.plat.domain.track.entity.*;
+import com.cabin.plat.domain.track.entity.Location;
+import com.cabin.plat.domain.track.entity.Track;
+import com.cabin.plat.domain.track.entity.TrackLike;
+import com.cabin.plat.domain.track.entity.TrackReport;
 import com.cabin.plat.domain.track.mapper.TrackMapper;
-import com.cabin.plat.domain.track.repository.*;
+import com.cabin.plat.domain.track.repository.LocationRepository;
+import com.cabin.plat.domain.track.repository.TrackLikeRepository;
+import com.cabin.plat.domain.track.repository.TrackReportRepository;
+import com.cabin.plat.domain.track.repository.TrackRepository;
 import com.cabin.plat.global.exception.RestApiException;
 import com.cabin.plat.global.exception.errorCode.TrackErrorCode;
 import com.cabin.plat.global.util.geocoding.AddressInfo;
@@ -48,10 +53,12 @@ public class TrackServiceImpl implements TrackService {
         double maxLongitude = Math.max(startLongitude, endLongitude);
 
         List<Track> tracks = trackRepository.findAllTracksWithinBounds(
-                minLatitude,
-                maxLatitude,
-                minLongitude,
-                maxLongitude);
+                        minLatitude,
+                        maxLatitude,
+                        minLongitude,
+                        maxLongitude).stream()
+                .filter(track -> track.getDeletedAt() == null)
+                .toList();
 
         List<TrackResponse.TrackMap> trackMaps = tracks.stream()
                 .map(track -> trackMapper.toTrackMap(
@@ -119,6 +126,7 @@ public class TrackServiceImpl implements TrackService {
         List<Track> tracks = trackRepository.findAll(pageable).getContent();
 
         List<TrackResponse.TrackDetail> trackDetails = tracks.stream()
+                .filter(track -> track.getDeletedAt() == null)
                 .map(track -> getTrackDetail(member, track))
                 .toList();
 
@@ -149,24 +157,52 @@ public class TrackServiceImpl implements TrackService {
     }
 
     private TrackDetail getTrackDetail(Member member, Track track) {
-        TrackResponse.MemberInfo memberInfo = trackMapper.toMemberInfo(
-                track.getMember().getId(),
-                track.getMember().getNickname(),
-                track.getMember().getAvatar()
-        );
+        TrackResponse.MemberInfo memberInfo;
+        Double latitude;
+        Double longitude;
+        String buildingName;
+        String address;
+        int likeCount;
+        boolean isLiked;
+
+        if (track.getDeletedAt() != null) {
+            memberInfo = trackMapper.toMemberInfo(
+                    null,
+                    "알수없음",
+                    ""
+            );
+            latitude = 0.0;
+            longitude = 0.0;
+            buildingName = "";
+            address = "";
+            likeCount = 0;
+            isLiked = false;
+        } else {
+            memberInfo = trackMapper.toMemberInfo(
+                    track.getMember().getId(),
+                    track.getMember().getNickname(),
+                    track.getMember().getAvatar()
+            );
+            latitude = track.getLocation().getLatitude();
+            longitude = track.getLocation().getLongitude();
+            buildingName = track.getLocation().getBuildingName();
+            address = track.getLocation().getAddress();
+            likeCount = trackLikeRepository.countByTrack(track);
+            isLiked = trackLikeRepository.existsByMemberAndTrack(member, track);
+        }
 
         return trackMapper.toTrackDetail(
                 track.getId(),
                 track.getIsrc(),
                 track.getCreatedAt(),
-                track.getLocation().getLatitude(),
-                track.getLocation().getLongitude(),
-                track.getLocation().getBuildingName(),
-                track.getLocation().getAddress(),
+                latitude,
+                longitude,
+                buildingName,
+                address,
                 track.getImageUrl(),
                 track.getContent(),
-                trackLikeRepository.countByTrack(track),
-                trackLikeRepository.existsByMemberAndTrack(member, track),
+                likeCount,
+                isLiked,
                 memberInfo
         );
     }
