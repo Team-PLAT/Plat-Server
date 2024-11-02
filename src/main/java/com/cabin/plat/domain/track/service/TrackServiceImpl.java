@@ -142,8 +142,8 @@ public class TrackServiceImpl implements TrackService {
                 return editedPosition;
             }
             count++;
-            latitude += -0.0001 + (0.0002 * random.nextDouble());
-            longitude += -0.0001 + (0.0002 * random.nextDouble());
+            latitude += -0.001 + (0.002 * random.nextDouble());
+            longitude += -0.001 + (0.002 * random.nextDouble());
             latitude = Math.round(latitude * 1_000_000) / 1_000_000.0;
             longitude = Math.round(longitude * 1_000_000) / 1_000_000.0;
         }
@@ -157,7 +157,7 @@ public class TrackServiceImpl implements TrackService {
             double lo2 = track.getLocation().getLongitude();
             double distance = Math.sqrt(Math.pow(la1 - la2, 2) + Math.pow(lo1 - lo2, 2));
 
-            if (distance <= 0.0001) {
+            if (distance <= 0.001) {
                 return true;
             }
         }
