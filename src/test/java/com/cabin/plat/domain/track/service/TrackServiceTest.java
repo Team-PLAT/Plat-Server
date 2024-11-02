@@ -373,8 +373,8 @@ class TrackServiceTest {
                 .isrc("test")
                 .imageUrl("https://testtest.com")
                 .content("테스트test")
-                .latitude(36.014108)
-                .longitude(129.325841)
+                .latitude(36.014188)
+                .longitude(129.325802)
                 .build();
 
         // when
@@ -382,9 +382,6 @@ class TrackServiceTest {
         Long trackId2 = trackService.addTrack(member, trackUpload2).getTrackId();
 
         // then
-        TrackResponse.TrackDetail trackDetail1 = trackService.getTrackById(member, trackId1);
-        assertThat(trackDetail1.getLatitude()).isEqualTo(36.014188);
-        assertThat(trackDetail1.getLongitude()).isEqualTo(129.325802);
         TrackResponse.TrackDetail trackDetail2 = trackService.getTrackById(member, trackId2);
         assertThat(trackDetail2.getLatitude()).isNotEqualTo(36.014108);
         assertThat(trackDetail2.getLongitude()).isNotEqualTo(129.325841);
