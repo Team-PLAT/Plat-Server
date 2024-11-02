@@ -353,9 +353,13 @@ class PlaylistServiceImplTest {
 
             // then
             assertThat(pagedPlaylists0.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists0.isHasNext()).isTrue();
             assertThat(pagedPlaylists1.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists1.isHasNext()).isTrue();
             assertThat(pagedPlaylists2.getPlaylists()).hasSize(1);
+            assertThat(pagedPlaylists2.isHasNext()).isFalse();
             assertThat(pagedPlaylists3.getPlaylists()).hasSize(0);
+            assertThat(pagedPlaylists3.isHasNext()).isFalse();
         }
 
         @Test

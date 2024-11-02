@@ -4,7 +4,10 @@ import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackMap;
-import com.cabin.plat.domain.track.entity.*;
+import com.cabin.plat.domain.track.entity.Location;
+import com.cabin.plat.domain.track.entity.Track;
+import com.cabin.plat.domain.track.entity.TrackLike;
+import com.cabin.plat.domain.track.entity.TrackReport;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -71,9 +74,11 @@ public class TrackMapper {
                 .build();
     }
 
-    public TrackResponse.TrackDetailList toTrackDetailList(List<TrackResponse.TrackDetail> trackDetails) {
+    public TrackResponse.TrackDetailList toTrackDetailList(List<TrackResponse.TrackDetail> trackDetails,
+                                                           boolean hasNext) {
         return TrackResponse.TrackDetailList.builder()
                 .trackDetails(trackDetails)
+                .hasNext(hasNext)
                 .build();
     }
 

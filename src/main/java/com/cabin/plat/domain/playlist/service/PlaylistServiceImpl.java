@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -70,12 +71,12 @@ public class PlaylistServiceImpl implements PlaylistService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sorts));
 
         // TODO: 효율 개선
-        List<Playlist> playlists = playlistRepository.findAllByMember(member, pageable).getContent();
-        List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
+        Page<Playlist> playlists = playlistRepository.findAllByMember(member, pageable);
+        List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.getContent().stream().map(playlist -> {
             List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(playlist);
             return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
         }).toList();
-        return playlistMapper.toPlaylists(playlistInfos);
+        return playlistMapper.toPlaylists(playlistInfos, playlists.hasNext());
     }
 
     @Override
@@ -85,20 +86,20 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .toLowerCase();
 
         if (refinedTitle.isEmpty() || refinedTitle.isBlank()) {
-            return playlistMapper.toPlaylists(Collections.emptyList());
+            return playlistMapper.toPlaylists(Collections.emptyList(), false);
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        List<Playlist> playlists = playlistRepository.
-                findAllByMemberAndTitleContainingIgnoreCase(member, refinedTitle, pageable).getContent();
+        Page<Playlist> playlists = playlistRepository.
+                findAllByMemberAndTitleContainingIgnoreCase(member, refinedTitle, pageable);
 
         // TODO: 효율 개선
-        List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.stream().map(playlist -> {
+        List<PlaylistResponse.Playlists.PlaylistInfo> playlistInfos = playlists.getContent().stream().map(playlist -> {
             List<PlaylistTrack> playlistTracks = findPlaylistTracksInPlaylist(playlist);
             return playlistMapper.toPlaylistInfo(playlist, playlistTracks);
         }).toList();
-        return playlistMapper.toPlaylists(playlistInfos);
+        return playlistMapper.toPlaylists(playlistInfos, playlists.hasNext());
     }
 
     @Transactional
