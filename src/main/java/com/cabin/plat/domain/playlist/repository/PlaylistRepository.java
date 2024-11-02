@@ -9,5 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     Page<Playlist> findAllByMember(Member member, Pageable pageable);
+    List<Playlist> findAllByMember(Member member);
     Page<Playlist> findAllByMemberAndTitleContainingIgnoreCase(Member member, String title, Pageable pageable);
 }

@@ -3,9 +3,13 @@ package com.cabin.plat.domain.track.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    public class TrackResponse {
+public class TrackResponse {
 
     @Getter
     @Builder

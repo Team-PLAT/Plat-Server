@@ -24,4 +24,6 @@ public interface MemberService {
     MemberResponse.MemberId resign(Member member);
 
     MemberResponse.MemberId updateNickname(Member member, String nickname);
+
+    Member findMemberById(Long id);
 }

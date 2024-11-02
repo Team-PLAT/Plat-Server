@@ -1,26 +1,32 @@
 package com.cabin.plat.domain.member.service;
 
-import com.cabin.plat.domain.member.dto.MemberResponse;
-import com.cabin.plat.domain.member.dto.MemberResponse.*;
-import com.cabin.plat.domain.member.entity.Member;
-import com.cabin.plat.domain.member.entity.StreamType;
-import com.cabin.plat.domain.member.mapper.MemberMapper;
-import com.cabin.plat.domain.member.repository.MemberRepository;
-import com.cabin.plat.global.exception.RestApiException;
-import com.cabin.plat.global.exception.errorCode.MemberErrorCode;
 import com.cabin.plat.config.jwt.dto.TokenInfo;
 import com.cabin.plat.config.jwt.service.JwtUtil;
 import com.cabin.plat.domain.member.dto.MemberRequest;
+import com.cabin.plat.domain.member.dto.MemberResponse;
+import com.cabin.plat.domain.member.dto.MemberResponse.MemberId;
+import com.cabin.plat.domain.member.dto.MemberResponse.ProfileInfo;
+import com.cabin.plat.domain.member.dto.MemberResponse.ProfileStreamType;
+import com.cabin.plat.domain.member.entity.Member;
 import com.cabin.plat.domain.member.entity.PermissionRole;
 import com.cabin.plat.domain.member.entity.RefreshToken;
 import com.cabin.plat.domain.member.entity.SocialType;
+import com.cabin.plat.domain.member.entity.StreamType;
 import com.cabin.plat.domain.member.mapper.AuthenticationMapper;
+import com.cabin.plat.domain.member.mapper.MemberMapper;
+import com.cabin.plat.domain.member.repository.MemberRepository;
 import com.cabin.plat.domain.member.repository.RefreshTokenRepository;
+import com.cabin.plat.domain.playlist.entity.PlaylistTrack;
+import com.cabin.plat.domain.playlist.repository.PlaylistRepository;
+import com.cabin.plat.domain.playlist.repository.PlaylistTrackRepository;
+import com.cabin.plat.domain.track.entity.Track;
+import com.cabin.plat.domain.track.repository.TrackRepository;
+import com.cabin.plat.global.exception.RestApiException;
+import com.cabin.plat.global.exception.errorCode.MemberErrorCode;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 
 @Service
@@ -33,6 +39,9 @@ public class MemberServiceImpl implements MemberService {
     private final AuthenticationMapper authenticationMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
+    private final TrackRepository trackRepository;
+    private final PlaylistTrackRepository playlistTrackRepository;
+    private final PlaylistRepository playlistRepository;
 
     @Override
     public MemberResponse.MemberSignIn appleSocialSignIn(
@@ -75,9 +84,9 @@ public class MemberServiceImpl implements MemberService {
             if (jwtUtil.isExpired(refreshToken)) {
                 return generateNewToken(member, isServiced);
             }
-            String newAccessToken = jwtUtil.createAccessToken(member.getId(), member.getClientId(), member.getPermissionRole());
+            String newAccessToken = jwtUtil.createAccessToken(member.getId(), member.getClientId(),
+                    member.getPermissionRole());
             TokenInfo tokenInfo = authenticationMapper.toTokenInfo(newAccessToken, refreshToken);
-
 
             refreshTokenRepository.save(new RefreshToken(member.getId(), refreshToken, newAccessToken));
             return memberMapper.toMemberSignIn(member, tokenInfo, isServiced);
@@ -85,7 +94,6 @@ public class MemberServiceImpl implements MemberService {
 
         TokenInfo tokenInfo = authenticationMapper.toTokenInfo(accessToken, refreshToken);
         return memberMapper.toMemberSignIn(member, tokenInfo, isServiced);
-
     }
 
     @Override
@@ -116,7 +124,8 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.toMemberId(updateMember.getId());
     }
 
-    private Member findMemberById(Long id) {
+    @Override
+    public Member findMemberById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
@@ -134,7 +143,8 @@ public class MemberServiceImpl implements MemberService {
 
         MemberResponse.MemberTokens memberTokens = jwtUtil.refreshTokens(memberId, clientId, permissionRole);
 
-        TokenInfo tokenInfo = authenticationMapper.toTokenInfo(memberTokens.getAccessToken(), memberTokens.getRefreshToken());
+        TokenInfo tokenInfo = authenticationMapper.toTokenInfo(memberTokens.getAccessToken(),
+                memberTokens.getRefreshToken());
 
         return memberMapper.toMemberSignIn(member, tokenInfo, isServiced);
     }
@@ -143,6 +153,11 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberResponse.MemberId resign(Member member) {
         Member deleteMember = findMemberById(member.getId());
+        playlistRepository.findAllByMember(deleteMember).forEach(playlist -> {
+            playlistTrackRepository.findAllByPlaylistIs(playlist).forEach(PlaylistTrack::delete);
+            playlist.delete();
+        });
+        trackRepository.findAllByMember(deleteMember).forEach(Track::delete);
         deleteMember.delete();
         memberRepository.save(deleteMember);
         return memberMapper.toMemberId(deleteMember.getId());

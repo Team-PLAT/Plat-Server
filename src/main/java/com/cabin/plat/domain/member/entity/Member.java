@@ -1,14 +1,21 @@
 package com.cabin.plat.domain.member.entity;
 
 import com.cabin.plat.global.common.BaseEntity;
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.Objects;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Getter
 @Builder
@@ -56,8 +63,12 @@ public class Member extends BaseEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Member)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Member)) {
+            return false;
+        }
         Member member = (Member) o;
         return id.equals(member.id) && clientId.equals(member.clientId);
     }
