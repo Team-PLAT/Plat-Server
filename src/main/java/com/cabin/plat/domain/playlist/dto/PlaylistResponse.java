@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class PlaylistResponse {
     @Getter
@@ -23,6 +26,7 @@ public class PlaylistResponse {
     @NoArgsConstructor
     public static class Playlists {
         private List<PlaylistInfo> playlists;
+        private boolean hasNext;
 
         @Getter
         @Builder

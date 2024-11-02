@@ -27,6 +27,7 @@ public class TrackResponse {
     public static class TrackDetailList {
         @Schema(description = "트랙 디테일 리스트")
         private List<TrackDetail> trackDetails;
+        private boolean hasNext;
     }
 
     @Getter

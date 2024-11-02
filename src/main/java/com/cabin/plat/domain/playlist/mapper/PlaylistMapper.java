@@ -45,9 +45,10 @@ public class PlaylistMapper {
                 .build();
     }
 
-    public PlaylistResponse.Playlists toPlaylists(List<PlaylistInfo> playlistInfos) {
+    public PlaylistResponse.Playlists toPlaylists(List<PlaylistInfo> playlistInfos, boolean hasNext) {
         return PlaylistResponse.Playlists.builder()
                 .playlists(playlistInfos)
+                .hasNext(hasNext)
                 .build();
     }
 

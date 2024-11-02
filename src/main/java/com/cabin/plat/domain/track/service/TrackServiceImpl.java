@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -170,14 +171,14 @@ public class TrackServiceImpl implements TrackService {
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, size, Sort.by(sorts));
 
-        List<Track> tracks = trackRepository.findAll(pageable).getContent();
+        Page<Track> trackPage = trackRepository.findAll(pageable);
 
-        List<TrackResponse.TrackDetail> trackDetails = tracks.stream()
+        List<TrackResponse.TrackDetail> trackDetails = trackPage.getContent().stream()
                 .filter(track -> track.getDeletedAt() == null)
                 .map(track -> getTrackDetail(member, track))
                 .toList();
 
-        return trackMapper.toTrackDetailList(trackDetails);
+        return trackMapper.toTrackDetailList(trackDetails, trackPage.hasNext());
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.cabin.plat.domain.member.service.MemberService;
 import com.cabin.plat.domain.track.dto.TrackRequest;
 import com.cabin.plat.domain.track.dto.TrackResponse;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetail;
+import com.cabin.plat.domain.track.dto.TrackResponse.TrackDetailList;
 import com.cabin.plat.domain.track.dto.TrackResponse.TrackMap;
 import com.cabin.plat.domain.track.entity.Location;
 import com.cabin.plat.domain.track.entity.Track;
@@ -408,14 +409,17 @@ class TrackServiceTest {
             Member member = members.get(0);
 
             // when
-            List<TrackDetail> firstPageTracks = trackService.getTrackFeeds(member, 0, 4).getTrackDetails();
-            List<TrackDetail> secondPageTracks = trackService.getTrackFeeds(member, 1, 4).getTrackDetails();
-            List<TrackDetail> thirdPageTracks = trackService.getTrackFeeds(member, 2, 4).getTrackDetails();
+            TrackDetailList firstPageTracks = trackService.getTrackFeeds(member, 0, 4);
+            TrackDetailList secondPageTracks = trackService.getTrackFeeds(member, 1, 4);
+            TrackDetailList thirdPageTracks = trackService.getTrackFeeds(member, 2, 4);
 
             // then
-            assertThat(firstPageTracks).hasSize(4);
-            assertThat(secondPageTracks).hasSize(2);
-            assertThat(thirdPageTracks).hasSize(0);
+            assertThat(firstPageTracks.getTrackDetails()).hasSize(4);
+            assertThat(firstPageTracks.isHasNext()).isTrue();
+            assertThat(secondPageTracks.getTrackDetails()).hasSize(2);
+            assertThat(secondPageTracks.isHasNext()).isFalse();
+            assertThat(thirdPageTracks.getTrackDetails()).hasSize(0);
+            assertThat(thirdPageTracks.isHasNext()).isFalse();
         }
 
         @Test
