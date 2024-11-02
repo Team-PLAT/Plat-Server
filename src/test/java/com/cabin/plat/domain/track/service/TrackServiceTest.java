@@ -358,6 +358,39 @@ class TrackServiceTest {
     }
 
     @Test
+    void 겹치는_트랙이_있으면_위치를_조정한다() {
+        // given
+        Member member = members.get(0);
+        TrackRequest.TrackUpload trackUpload1 = TrackRequest.TrackUpload.builder()
+                .isrc("isrc9")
+                .imageUrl("https://testimage9.com")
+                .content("테스트9")
+                .latitude(36.014188)
+                .longitude(129.325802)
+                .build();
+
+        TrackRequest.TrackUpload trackUpload2 = TrackRequest.TrackUpload.builder()
+                .isrc("test")
+                .imageUrl("https://testtest.com")
+                .content("테스트test")
+                .latitude(36.014108)
+                .longitude(129.325841)
+                .build();
+
+        // when
+        Long trackId1 = trackService.addTrack(member, trackUpload1).getTrackId();
+        Long trackId2 = trackService.addTrack(member, trackUpload2).getTrackId();
+
+        // then
+        TrackResponse.TrackDetail trackDetail1 = trackService.getTrackById(member, trackId1);
+        assertThat(trackDetail1.getLatitude()).isEqualTo(36.014188);
+        assertThat(trackDetail1.getLongitude()).isEqualTo(129.325802);
+        TrackResponse.TrackDetail trackDetail2 = trackService.getTrackById(member, trackId2);
+        assertThat(trackDetail2.getLatitude()).isNotEqualTo(36.014108);
+        assertThat(trackDetail2.getLongitude()).isNotEqualTo(129.325841);
+    }
+
+    @Test
     void getTrackFeedsTest_개수만() {
         // given
         Member member = members.get(0);
