@@ -21,6 +21,7 @@ import com.cabin.plat.global.util.geocoding.ReverseGeoCoding;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -103,6 +104,20 @@ public class TrackServiceImpl implements TrackService {
     public TrackResponse.TrackId addTrack(Member member, TrackRequest.TrackUpload trackUpload) {
         double latitude = trackUpload.getLatitude();
         double longitude = trackUpload.getLongitude();
+
+        List<Track> nearTracks = trackRepository.findAllTracksWithinBounds(
+                latitude - 0.001,
+                latitude + 0.001,
+                longitude - 0.001,
+                longitude + 0.001
+        );
+
+        if (hasNearTrack(latitude, longitude, nearTracks)) {
+            List<Double> editedPosition = editOverlapPosition(latitude, longitude, nearTracks);
+            latitude = editedPosition.get(0);
+            longitude = editedPosition.get(1);
+        }
+
         AddressInfo addressInfo = reverseGeoCoding.getAddressInfo(latitude, longitude);
 
         Location location = locationRepository.save(trackMapper.toLocation(
@@ -115,6 +130,38 @@ public class TrackServiceImpl implements TrackService {
         Track savedTrack = trackRepository.save(track);
 
         return trackMapper.toTrackId(savedTrack.getId());
+    }
+
+    private List<Double> editOverlapPosition(double latitude, double longitude, List<Track> nearTracks) {
+        List<Double> editedPosition = new ArrayList<>();
+        Random random = new Random();
+
+        int count = 0;
+        while (hasNearTrack(latitude, longitude, nearTracks)) {
+            if (count > 10) {
+                return editedPosition;
+            }
+            count++;
+            latitude += -0.0001 + (0.0002 * random.nextDouble());
+            longitude += -0.0001 + (0.0002 * random.nextDouble());
+            latitude = Math.round(latitude * 1_000_000) / 1_000_000.0;
+            longitude = Math.round(longitude * 1_000_000) / 1_000_000.0;
+        }
+
+        return List.of(latitude, longitude);
+    }
+
+    private boolean hasNearTrack(double la1, double lo1, List<Track> overlayTracks) {
+        for (Track track : overlayTracks) {
+            double la2 = track.getLocation().getLatitude();
+            double lo2 = track.getLocation().getLongitude();
+            double distance = Math.sqrt(Math.pow(la1 - la2, 2) + Math.pow(lo1 - lo2, 2));
+
+            if (distance <= 0.0001) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
